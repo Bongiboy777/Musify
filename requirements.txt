@@ -24,3 +24,7 @@ click
 peft
 tensorboard
 tensorboardX
+fastapi[standard]
+boto3
+pydantic
+torchcodec==0.10.0
