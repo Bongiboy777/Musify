@@ -8,11 +8,24 @@ export const env = createEnv({
    */
   server: {
     DATABASE_URL: z.string().url(),
+    AWS_ACCESS_KEY_ID: z.string().min(1, "AWS_ACCESS_KEY_ID is required"),
+    AWS_SECRET_ACCESS_KEY: z
+      .string()
+      .min(1, "AWS_SECRET_ACCESS_KEY is required"), 
+    MODAL_SECRET: z.string().min(1, "MODAL_SECRET is required"),
+    MODAL_KEY: z.string().min(1, "MODAL_KEY is required"),
+    S3_BUCKET_NAME: z.string().min(1, "S3_BUCKET_NAME is required"),
+    AWS_REGION: z.string().min(1, "AWS_REGION is required"),
+    GENERATE_ENDPOINT_URL: z
+      .string()
+      .url("GENERATE_ENDPOINT_URL must be a valid URL"),
+
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
-  },
 
+  },
+ 
   /**
    * Specify your client-side environment variables schema here. This way you can ensure the app
    * isn't built with invalid env vars. To expose them to the client, prefix them with
@@ -29,6 +42,14 @@ export const env = createEnv({
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
+    MODAL_SECRET: process.env.MODAL_SECRET,
+    MODAL_KEY: process.env.MODAL_KEY,
+    S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
+    AWS_REGION: process.env.AWS_REGION,
+    GENERATE_ENDPOINT_URL: process.env.GENERATE_ENDPOINT_URL,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**

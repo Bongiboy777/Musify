@@ -15,7 +15,7 @@ import logging
 import random
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-app = modal.App("music generator")
+app = modal.App("musify-backend")
 
 aceStepVolume = modal.Volume.from_name("ace-step-models", create_if_missing=True)
 hf_volume = modal.Volume.from_name("qwen_hf_cache", create_if_missing=True)
