@@ -121,11 +121,24 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.PostScalarFieldEnum = {
+exports.Prisma.LikeScalarFieldEnum = {
+  userId: 'userId',
+  songId: 'songId'
+};
+
+exports.Prisma.CategoryScalarFieldEnum = {
   id: 'id',
-  name: 'name',
+  name: 'name'
+};
+
+exports.Prisma.SongScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  lyrics: 'lyrics',
+  userId: 'userId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  listenCount: 'listenCount'
 };
 
 exports.Prisma.UserScalarFieldEnum = {
@@ -191,7 +204,9 @@ exports.Prisma.NullsOrder = {
 
 
 exports.Prisma.ModelName = {
-  Post: 'Post',
+  Like: 'Like',
+  Category: 'Category',
+  Song: 'Song',
   User: 'User',
   Session: 'Session',
   Account: 'Account',
