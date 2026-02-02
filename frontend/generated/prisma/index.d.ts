@@ -9900,13 +9900,13 @@ export namespace Prisma {
   }
 
   export type CategoryCreateInput = {
-    id: string
+    id?: string
     name: string
     songs?: SongCreateNestedManyWithoutCategoriesInput
   }
 
   export type CategoryUncheckedCreateInput = {
-    id: string
+    id?: string
     name: string
     songs?: SongUncheckedCreateNestedManyWithoutCategoriesInput
   }
@@ -9924,7 +9924,7 @@ export namespace Prisma {
   }
 
   export type CategoryCreateManyInput = {
-    id: string
+    id?: string
     name: string
   }
 
@@ -9939,7 +9939,7 @@ export namespace Prisma {
   }
 
   export type SongCreateInput = {
-    id: string
+    id?: string
     title: string
     lyrics?: string | null
     createdAt?: Date | string
@@ -9951,7 +9951,7 @@ export namespace Prisma {
   }
 
   export type SongUncheckedCreateInput = {
-    id: string
+    id?: string
     title: string
     lyrics?: string | null
     userId: string
@@ -9987,7 +9987,7 @@ export namespace Prisma {
   }
 
   export type SongCreateManyInput = {
-    id: string
+    id?: string
     title: string
     lyrics?: string | null
     userId: string
@@ -10016,7 +10016,7 @@ export namespace Prisma {
   }
 
   export type UserCreateInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified?: boolean
@@ -10030,7 +10030,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified?: boolean
@@ -10072,7 +10072,7 @@ export namespace Prisma {
   }
 
   export type UserCreateManyInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified?: boolean
@@ -10102,7 +10102,7 @@ export namespace Prisma {
   }
 
   export type SessionCreateInput = {
-    id: string
+    id?: string
     expiresAt: Date | string
     token: string
     createdAt?: Date | string
@@ -10113,7 +10113,7 @@ export namespace Prisma {
   }
 
   export type SessionUncheckedCreateInput = {
-    id: string
+    id?: string
     expiresAt: Date | string
     token: string
     createdAt?: Date | string
@@ -10146,7 +10146,7 @@ export namespace Prisma {
   }
 
   export type SessionCreateManyInput = {
-    id: string
+    id?: string
     expiresAt: Date | string
     token: string
     createdAt?: Date | string
@@ -11342,7 +11342,7 @@ export namespace Prisma {
   }
 
   export type UserCreateWithoutLikesInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified?: boolean
@@ -11355,7 +11355,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateWithoutLikesInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified?: boolean
@@ -11373,7 +11373,7 @@ export namespace Prisma {
   }
 
   export type SongCreateWithoutLikesInput = {
-    id: string
+    id?: string
     title: string
     lyrics?: string | null
     createdAt?: Date | string
@@ -11384,7 +11384,7 @@ export namespace Prisma {
   }
 
   export type SongUncheckedCreateWithoutLikesInput = {
-    id: string
+    id?: string
     title: string
     lyrics?: string | null
     userId: string
@@ -11470,7 +11470,7 @@ export namespace Prisma {
   }
 
   export type SongCreateWithoutCategoriesInput = {
-    id: string
+    id?: string
     title: string
     lyrics?: string | null
     createdAt?: Date | string
@@ -11481,7 +11481,7 @@ export namespace Prisma {
   }
 
   export type SongUncheckedCreateWithoutCategoriesInput = {
-    id: string
+    id?: string
     title: string
     lyrics?: string | null
     userId: string
@@ -11526,7 +11526,7 @@ export namespace Prisma {
   }
 
   export type UserCreateWithoutSongsInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified?: boolean
@@ -11539,7 +11539,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateWithoutSongsInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified?: boolean
@@ -11557,12 +11557,12 @@ export namespace Prisma {
   }
 
   export type CategoryCreateWithoutSongsInput = {
-    id: string
+    id?: string
     name: string
   }
 
   export type CategoryUncheckedCreateWithoutSongsInput = {
-    id: string
+    id?: string
     name: string
   }
 
@@ -11675,7 +11675,7 @@ export namespace Prisma {
   }
 
   export type SessionCreateWithoutUserInput = {
-    id: string
+    id?: string
     expiresAt: Date | string
     token: string
     createdAt?: Date | string
@@ -11685,7 +11685,7 @@ export namespace Prisma {
   }
 
   export type SessionUncheckedCreateWithoutUserInput = {
-    id: string
+    id?: string
     expiresAt: Date | string
     token: string
     createdAt?: Date | string
@@ -11745,7 +11745,7 @@ export namespace Prisma {
   }
 
   export type SongCreateWithoutUserInput = {
-    id: string
+    id?: string
     title: string
     lyrics?: string | null
     createdAt?: Date | string
@@ -11756,7 +11756,7 @@ export namespace Prisma {
   }
 
   export type SongUncheckedCreateWithoutUserInput = {
-    id: string
+    id?: string
     title: string
     lyrics?: string | null
     createdAt?: Date | string
@@ -11892,7 +11892,7 @@ export namespace Prisma {
   }
 
   export type UserCreateWithoutSessionsInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified?: boolean
@@ -11905,7 +11905,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified?: boolean
@@ -11960,7 +11960,7 @@ export namespace Prisma {
   }
 
   export type UserCreateWithoutAccountsInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified?: boolean
@@ -11973,7 +11973,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified?: boolean
@@ -12091,7 +12091,7 @@ export namespace Prisma {
   }
 
   export type SessionCreateManyUserInput = {
-    id: string
+    id?: string
     expiresAt: Date | string
     token: string
     createdAt?: Date | string
@@ -12116,7 +12116,7 @@ export namespace Prisma {
   }
 
   export type SongCreateManyUserInput = {
-    id: string
+    id?: string
     title: string
     lyrics?: string | null
     createdAt?: Date | string
