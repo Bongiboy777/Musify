@@ -10,6 +10,7 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
 
+
     /* Strictness */
     "strict": true,
     "noUncheckedIndexedAccess": true,
@@ -30,6 +31,10 @@
       "@/*": ["./src/*"]
     }
   },
+  
+      "content": [
+    "./node_modules/@daveyplate/better-auth-ui/dist/**/*.{js,ts,jsx,tsx,mdx}"
+],
   "include": [
     "next-env.d.ts",
     "**/*.ts",

@@ -2,11 +2,34 @@ import Link from "next/link";
 
 import { LatestPost } from "@/app/_components/post";
 import { api, HydrateClient } from "@/trpc/server";
+import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client"; //import the auth client
+import image from "next/image";
 
+const { data, error } = await authClient.signUp.email({
+        email:"bongiluwe777@gmail.com", // user email address
+        password:"wvawnbea3", // user password -> min 8 characters by default
+        name:"bngi", // user display name
+        image:"https://cdn-blog.superprof.com/blog_in/wp-content/uploads/2023/03/image1-7-1060x596.png", // User image URL (optional)
+        callbackURL: "/dashboard" // A URL to redirect to after the user verifies their email (optional)
+    }, {
+        onRequest: (ctx) => {
+            //show loading
+        },
+        onSuccess: (ctx) => {
+          console.log("User signed up successfully:", ctx);
+            //redirect to the dashboard or sign in page
+        },
+        onError: (ctx) => {
+            // display the error message
+            alert(ctx.error.message);
+        },
+});
 export default async function Home() {
   const hello = await api.post.hello({ text: "from tRPC" });
 
   void api.post.getLatest.prefetch();
+
 
   return (
     <HydrateClient>
@@ -27,6 +50,9 @@ export default async function Home() {
                 database and authentication.
               </div>
             </Link>
+            <Button >
+
+            </Button>
             <Link
               className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
               href="https://create.t3.gg/en/introduction"

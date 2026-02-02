@@ -12,8 +12,8 @@ export const env = createEnv({
     AWS_SECRET_ACCESS_KEY: z
       .string()
       .min(1, "AWS_SECRET_ACCESS_KEY is required"), 
-    MODAL_SECRET: z.string().min(1, "MODAL_SECRET is required"),
-    MODAL_KEY: z.string().min(1, "MODAL_KEY is required"),
+    MODAL_PROXY_SECRET: z.string().min(1, "MODAL_PROXY_SECRET is required"),
+    MODAL_PROXY_KEY: z.string().min(1, "MODAL_PROXY_KEY is required"),
     S3_BUCKET_NAME: z.string().min(1, "S3_BUCKET_NAME is required"),
     AWS_REGION: z.string().min(1, "AWS_REGION is required"),
     GENERATE_ENDPOINT_URL: z
@@ -42,8 +42,8 @@ export const env = createEnv({
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
-    MODAL_SECRET: process.env.MODAL_SECRET,
-    MODAL_KEY: process.env.MODAL_KEY,
+    MODAL_PROXY_SECRET: process.env.MODAL_PROXY_SECRET,
+    MODAL_PROXY_KEY: process.env.MODAL_PROXY_KEY,
     S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
     AWS_REGION: process.env.AWS_REGION,
     GENERATE_ENDPOINT_URL: process.env.GENERATE_ENDPOINT_URL,

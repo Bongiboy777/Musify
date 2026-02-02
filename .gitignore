@@ -15,6 +15,7 @@
 # production
 /build
 
+/acestep/__pycache__/
 # misc
 .DS_Store
 *.pem
@@ -34,3 +35,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+acestep/__pycache__/
+acestep/__pycache__/*
+
+*.pyc
+
+acestep/__pycache__/__init__.cpython-312.pyc
