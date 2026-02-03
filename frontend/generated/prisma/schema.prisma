@@ -12,43 +12,51 @@ datasource db {
 }
 
 model Like {
+  // id String @id @default(cuid())
   userId String
   songId String
   user   User   @relation(fields: [userId], references: [id])
   song   Song   @relation(fields: [songId], references: [id])
 
   @@id([userId, songId])
-  @@map("like")
+  @@unique([userId, songId])
+}
+
+// thinking, use the @relation field, when each row in table must have exactly 1 corresponding row to another, e.g. each song is created by one user, so we can have one user id per row of song.
+
+model Song {
+  id            String     @id @default(cuid())
+  title         String
+  userId        String
+  user          User       @relation(fields: [userId], references: [id])
+  seed          Float?
+  prompt        String?
+  lyrics        String?
+  instrumental  Boolean    @default(false)
+  s3_loc        String     @unique
+  image_s3_loc  String     @unique
+  guidanceScale Float      @default(0.5)
+  inferStep     Float
+  audioDuration Float
+  categories    Category[]
+  likes         Like[]
+  listenCount   Int        @default(0)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@map("song")
 }
 
 model Category {
   id    String @id
-  name  String @unique
+  title String @unique
   songs Song[]
 
   @@map("category")
 }
 
-model Song {
-  // song ingo
-  id     String  @id
-  title  String
-  lyrics String?
-  userId String
-  user   User    @relation(fields: [userId], references: [id])
-
-  categories Category[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-
-  // metrics  
-  likes       Like[]
-  listenCount Int    @default(0)
-}
-
 model User {
-  id            String    @id
+  id            String    @id @default(cuid())
   name          String
   email         String
   emailVerified Boolean   @default(false)
@@ -57,6 +65,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  credits       Int       @default(100)
   songs         Song[]
   likes         Like[]
 
