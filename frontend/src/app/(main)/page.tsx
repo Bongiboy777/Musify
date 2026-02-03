@@ -1,40 +1,28 @@
 import Link from "next/link";
 import { api, HydrateClient } from "@/trpc/server";
+import { getSession, router } from "better-auth/api";
+import { redirect } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import {auth} from "@/lib/auth"
+import { headers } from "next/headers";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client"; //import the auth client
-import image from "next/image";
-
-// const { data, error } = await authClient.signUp.email({
-//         email:"bongiluwe777@gmail.com", // user email address
-//         password:"wvawnbea3", // user password -> min 8 characters by default
-//         name:"bngi", // user display name
-//         image:"https://cdn-blog.superprof.com/blog_in/wp-content/uploads/2023/03/image1-7-1060x596.png", // User image URL (optional)
-//         callbackURL: "/dashboard" // A URL to redirect to after the user verifies their email (optional)
-//     }, {
-//         onRequest: (ctx) => {
-//             //show loading
-//         },
-//         onSuccess: (ctx) => {
-//           console.log("User signed up successfully:", ctx);
-//             //redirect to the dashboard or sign in page
-//         },
-//         onError: (ctx) => {
-//             // display the error message
-//             // alert(ctx.error.message);
-//         },
-// });
 export default async function Home() {
   const hello = await api.post.hello({ text: "from tRPC" });
+  const session = await auth.api.getSession({
+    headers: await headers()
+  })
+  void api.post.getLatest.prefetch();
 
-  // void api.post.getLatest.prefetch();
-
+  // if (!session){
+  //   redirect('auth/sign-in')
+  // }
 
   return (
     <HydrateClient>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
+            {/* Create <span className="text-[hsl(280,100%,70%)]">T3 {session.user.name}</span> App */}
           </h1>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
             <Link
