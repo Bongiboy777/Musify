@@ -295,7 +295,7 @@ class MusicModelServer:
         self,
         prompt: str = "Vintage retro keys sample Chick corea",
         lyrics: str = "[Instrumental]",
-        audio_duration: int = 180,
+        audio_duration: float = 180,
         infer_step: int = 60,
         guidance_scale: int = 15,
         scheduler_type: str = "euler",
