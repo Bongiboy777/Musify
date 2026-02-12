@@ -1,3 +1,5 @@
+
+
 import Link from "next/link";
 import { api, HydrateClient } from "@/trpc/server";
 import { getSession, router } from "better-auth/api";
@@ -6,23 +8,26 @@ import { authClient } from "@/lib/auth-client";
 import {auth} from "@/lib/auth"
 import { headers } from "next/headers";
 import { Button } from "@/components/ui/button";
+import C from "@/components/c";
+
 export default async function Home() {
-  const hello = await api.post.hello({ text: "from tRPC" });
+  const hello = await api.post.getLatest();
   const session = await auth.api.getSession({
     headers: await headers()
   })
   void api.post.getLatest.prefetch();
 
-  // if (!session){
-  //   redirect('auth/sign-in')
-  // }
+  if (!session){
+    redirect('auth/sign-in')
+  }
+
 
   return (
     <HydrateClient>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            {/* Create <span className="text-[hsl(280,100%,70%)]">T3 {session.user.name}</span> App */}
+            Create <span className="text-[hsl(280,100%,70%)]">T3 {session.user.id}</span> App
           </h1>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
             <Link
@@ -36,9 +41,7 @@ export default async function Home() {
                 database and authentication.
               </div>
             </Link>
-            <Button >
-
-            </Button>
+            <C userId={session.user.id} />
             <Link
               className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
               href="https://create.t3.gg/en/introduction"
@@ -53,7 +56,7 @@ export default async function Home() {
           </div>
           <div className="flex flex-col items-center gap-2">
             <p className="text-2xl text-white">
-              {hello ? hello.greeting : "Loading tRPC query..."}
+              {hello ? hello.name : "Loading tRPC query..."}
             </p>
           </div>
         </div>
