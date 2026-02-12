@@ -2,15 +2,6 @@ import { inngest } from "@/inngest/client";
 import { db } from "@/server/db";
 import { env } from "node:process";
 
-export const helloWorld = inngest.createFunction(
-  { id: "hello-world" },
-  { event: "test/hello.world" },
-  async ({ event, step }) => {
-    await step.sleep("wait-a-moment", "1s");
-    return { message: `Hello ${event.data.email}!` };
-  },
-);
-
 // This is all we need from api call, the song data, minus s3 locations will have been uploaded, so we use db client to get the information, song status should be queued from frontend
 interface GenerateMusicEventData {
   userId: string,
@@ -110,4 +101,16 @@ export const GenerateMusic = inngest.createFunction(
 
 
   }
+
 )
+
+
+export const helloWorld = inngest.createFunction(
+  { id: "hello-world" },
+  { event: "test/hello.world" },
+  async ({ event, step }) => {
+    await step.sleep("wait-a-moment", "1s");
+    return { message: `Hello ${event.data.email}!` };
+  },
+);
+  

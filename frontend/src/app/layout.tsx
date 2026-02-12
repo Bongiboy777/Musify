@@ -1,9 +1,15 @@
 import "@/styles/globals.css"
 
 import { type Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Atma } from "next/font/google";
 
 import { Providers } from "@/app/(main)/providers";
+
+const atma = Atma({
+  subsets: ["latin"],
+  variable: "--font-atma",
+  weight: ["400", "500", "600", "700"],
+});
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -11,16 +17,13 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-const geist = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist-sans",
-});
+
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geist.variable}`}>
+    <html lang="en" className={`${atma.variable}`}>
       <body>
                     <Providers>
                        {children}

@@ -289,6 +289,10 @@ class MusicModelServer:
         
         full_prompt = f"{formatted_prompt}\n\n{lyrics}"
         return response  
+    
+    @modal.fastapi_endpoint(method='POST')
+    def testModalEndpoint(self):
+        return {'message': 'Message sent to modal endpoint, well done!'}
 
     @modal.fastapi_endpoint(method="POST", requires_proxy_auth=True)
     def generateAndPostToS3(
