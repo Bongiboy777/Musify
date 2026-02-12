@@ -26,18 +26,20 @@ model Like {
 
 model Song {
   id String @id @default(cuid())
-  title String
+  title String?
   userId String
   user User @relation(fields: [userId], references: [id])  
   seed Float?
-  prompt String?
-  lyrics String?
+  fullPrompt String? @map("prompt")
+  describedPrompt String?
+  fullLyrics String? @map("lyrics")
+  describedLyrics String? 
   instrumental Boolean @default(false)
-  s3_loc String @unique
-  image_s3_loc String @unique
+  s3_loc String? @unique
+  image_s3_loc String? @unique
   guidanceScale Float @default(0.5)
-  inferStep Float
-  audioDuration Float
+  inferStep Float @default(0.5)
+  audioDuration Float @default(120) // default to 2 minutes
   categories Category[]
   likes Like[]
   listenCount Int @default(0)

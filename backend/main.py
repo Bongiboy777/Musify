@@ -7,11 +7,8 @@ import torch
 import requests
 from pydantic import BaseModel
 import base64
-from fastapi.responses import HTMLResponse, JSONResponse, ORJSONResponse, FileResponse
-from pydantic import BaseModel
 from acestep.pipeline_ace_step import ACEStepPipeline
 from diffusers.pipelines.auto_pipeline import AutoPipelineForText2Image
-from botocore.config import Config
 import logging
 import random
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -57,8 +54,11 @@ class GeneratedMusicResponse(BaseModel):
 
 
 class GeneratedMusicResponseS3(BaseModel):
-    audio_str: str = modal.parameter()
-    lyrics: str = modal.parameter()
+    s3_audio_path: str = modal.parameter()
+    s3_image_path: str = modal.parameter()
+    fullPrompt: str = modal.parameter()
+    fullLyrics: str = modal.parameter()
+    title: str = modal.parameter()
     categories: list[str] = modal.parameter()
 
 
@@ -371,7 +371,12 @@ class MusicModelServer:
             logger = logging.getLogger("Musify.MusicModelServer.generateAndPostToS3")
             logger.exception("Error decoding audio file: %s", e)
             raise
-        return GeneratedMusicResponseS3(audio_str=out_str, lyrics=formatted_lyrics, categories=categories)
+        return GeneratedMusicResponseS3(
+            fullPrompt=formatted_prompt,
+            fullLyrics=formatted_lyrics,
+            s3_audio_path=music_cloud_path,
+            s3_image_path=img_cloud_path,
+            categories=categories)
 
 @app.local_entrypoint()
 def main():
@@ -459,23 +464,22 @@ def SendAndProcessRequest(endpoint_url, image_model_name, llm_model_name):
             raise
         # breakpoint()
 
-        music_response = GeneratedMusicResponseS3(audio_str=response_json["audio_str"], lyrics=response_json["lyrics"], categories=response_json["categories"])
-
         if response.ok:
-            out_fname = f"{uuid.uuid4()}.wav"
-            # os.makedirs('/model_outputs/', exist_ok=True)
-            print("Decoding audio string and writing to %s", out_fname)
-            print(f"len audio str: {len(music_response.audio_str)}")
-            res_bytes = base64.b64decode(music_response.audio_str)
-            print(f"returned categories: {music_response.categories}")
-            print(f"returned lyrics: {music_response.lyrics}")
-            print(os.path.abspath(out_fname))
-            with open(out_fname, "wb") as stream:
-                stream.write(res_bytes)
+            pass
+            # out_fname = f"{uuid.uuid4()}.wav"
+            # # os.makedirs('/model_outputs/', exist_ok=True)
+            # print("Decoding audio string and writing to %s", out_fname)
+            # print(f"len audio str: {len(music_response.audio_str)}")
+            # res_bytes = base64.b64decode(music_response.audio_str)
+            # print(f"returned categories: {music_response.categories}")
+            # print(f"returned lyrics: {music_response.lyrics}")
+            # print(os.path.abspath(out_fname))
+            # with open(out_fname, "wb") as stream:
+            #     stream.write(res_bytes)
 
-            size = os.path.getsize(out_fname)
+            # size = os.path.getsize(out_fname)
 
-            print("Wrote audio file %s (%d bytes)", out_fname, size)
+            # print("Wrote audio file %s (%d bytes)", out_fname, size)
         else:
             logger.error(
                 "Endpoint returned non-OK status: %s. Response text: %s",

@@ -7,12 +7,14 @@ export const dynamic = "force-dynamic";
 // Create a simple async Next.js API route handler
 export async function GET() {
   // Send your event payload to Inngest
-  await inngest.send({
+  const res = await inngest.send({
     name: "test/hello.world",
     data: {
       email: "testUser@example.com",
     },
   });
 
-  return NextResponse.json({ message: "Event sent!" });
+  console.log("Inngest response:", res);
+
+  return NextResponse.json({ message: "Event sent!\n" + JSON.stringify(res) });
 }
