@@ -40,7 +40,7 @@ interface UserParamsRelevantToMusicGeneration {
 * 
 */
 export const GenerateMusic = inngest.createFunction(
-  { id: "generate-music" },
+  { id: "generate-music", concurrency: { limit: 1 },  },
   { event: "user/generate.music" },
   async ({ event, step }) => {
 
@@ -53,19 +53,33 @@ export const GenerateMusic = inngest.createFunction(
         if (user.credits < 1) {
           throw Error(`user does not have enough credits, current balance: ${user.credits}`)
         }
+        
       });
       const params = await step.run('get-params', async () => {
-        // remember to set described lyrics to ['instrumental'] in db before calling
+        // Modal class parameters must be passed as query parameters
+        const imageModelName = "stabilityai/sdxl-turbo";
+        const llmModelName = "Qwen/Qwen2.5-7B-Instruct";
+        
+        // Build the URL with query parameters for the Modal class
+        const url = new URL("https://bongiboy777--musify-backend-musicmodelserver-generat-994822-dev.modal.run");
+        url.searchParams.append("image_model_name", imageModelName);
+        url.searchParams.append("llm_model_name", llmModelName);
+        
+        
+        // Endpoint method parameters
         const commonParams = {
+          prompt: song.describedPrompt || "Vintage retro keys sample", // Add prompt from song
           infer_step: song.inferStep,
           guidance_scale: song.guidanceScale,
           audio_duration: song.audioDuration,
-
-
+          scheduler_type: "euler",
+          music_cloud_dir: song.id, // Use song ID for S3 organization
+          img_cloud_dir: song.id,
         }
+        
         if (song.instrumental) {
           return {
-            endpoint: env.GENERATE_ENDPOINT_URL,
+            endpoint: url.toString(),
             body: {
               lyrics: "[Instrumental]",
               ...commonParams
@@ -74,25 +88,37 @@ export const GenerateMusic = inngest.createFunction(
         }
 
         return {
-          endpoint: env.GENERATE_ENDPOINT_URL,
+          endpoint: url.toString(),
           body: {
             lyrics: song.describedLyrics,
             ...commonParams
           }
-
         }
-      }
-      );
+      });
+      
       const fetchResponse = await step.fetch(
-        params.endpoint!,
+        params.endpoint,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Modal-Key": process.env.MODAL_PROXY_KEY!,
+            "Modal-Secret": process.env.MODAL_PROXY_SECRET!,
           },
+          
           body: JSON.stringify(params.body),
         }
       )
+      console.log(`status of response: ${fetchResponse.status}`);
+
+      if (!fetchResponse.ok) {
+        const errorText = await fetchResponse.text();
+        throw Error(`Request failed with status ${fetchResponse.status}: ${errorText}`);
+      }
+
+      const responseData = await fetchResponse.json();
+      console.log("Received response data:", responseData);
+      return responseData
 
     }
     catch (e) {

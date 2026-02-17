@@ -3,9 +3,11 @@ import React from 'react'
 import { Button } from './ui/button'
 import { title } from 'process';
 import type { GenerationParams } from '@/lib/types/generation-params';
+import { db } from '@/server/db';
 
 const C = ({ userId }: { userId: string }) => {
     const [data, setData] = React.useState<any>(null);
+   
 
     if (data){
         console.log("Data received from API:", data);
@@ -42,7 +44,7 @@ const C = ({ userId }: { userId: string }) => {
         return data;
       }
 
-      const handleClick = async (e) => {
+      const handleClick = async (e: any) => {
         e.preventDefault();
         await requestGeneration();
       }

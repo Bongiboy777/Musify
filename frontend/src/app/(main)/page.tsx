@@ -9,6 +9,7 @@ import {auth} from "@/lib/auth"
 import { headers } from "next/headers";
 import { Button } from "@/components/ui/button";
 import C from "@/components/c";
+import { db } from "@/server/db";
 
 export default async function Home() {
   const hello = await api.post.getLatest();
@@ -20,6 +21,14 @@ export default async function Home() {
   if (!session){
     redirect('auth/sign-in')
   }
+
+   setInterval(async() => {
+      await db.user.findUniqueOrThrow({
+        where: {
+          id: session.user.id,
+        }
+      })
+    }, 240000)
 
 
   return (

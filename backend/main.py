@@ -56,11 +56,10 @@ class GeneratedMusicResponse(BaseModel):
 class GeneratedMusicResponseS3(BaseModel):
     s3_audio_path: str = modal.parameter()
     s3_image_path: str = modal.parameter()
-    fullPrompt: str = modal.parameter()
-    fullLyrics: str = modal.parameter()
-    title: str = modal.parameter()
     categories: list[str] = modal.parameter()
 
+class TestResponse(BaseModel):
+    message: str = modal.parameter()
 
 class BaseGenerationRequest(BaseModel):
     prompt: str = "Vintage retro keys sample Chick corea"
@@ -292,8 +291,8 @@ class MusicModelServer:
     
     @modal.fastapi_endpoint(method='POST')
     def testModalEndpoint(self):
-        return {'message': 'Message sent to modal endpoint, well done!'}
-
+        print(f'testModalEndpoint called')
+        return TestResponse(message="This is a test response from the Modal endpoint!")
     @modal.fastapi_endpoint(method="POST", requires_proxy_auth=True)
     def generateAndPostToS3(
         self,
