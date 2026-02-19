@@ -18,7 +18,7 @@ model Like {
   @@unique([userId, songId])
 }
 
-enum SongStatus {
+enum JobStatus {
   QUEUED
   IN_PROGRESS
   COMPLETED
@@ -44,11 +44,20 @@ model Song {
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
   likes           Like[]
-  status          SongStatus @default(QUEUED)
+  jobId           String?
   user            User       @relation(fields: [userId], references: [id])
   categories      Category[] @relation("CategoryToSong")
-
   @@map("song")
+}
+
+model Job {
+  id        String   @id @default(cuid())
+  event     String
+  payload   Json
+  status    JobStatus @default(QUEUED)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("job")
 }
 
 model Category {

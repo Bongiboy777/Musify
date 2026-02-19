@@ -44,21 +44,31 @@ export const GenerateMusic = inngest.createFunction(
   { event: "user/generate.music" },
   async ({ event, step }) => {
 
+    
     try {
+ 
       console.log("Received event data:", event.data);
       const e = event.data as GenerateMusicEventData
+       
       const user = await db.user.findUniqueOrThrow({ where: { id: e.userId } })
       const song = await db.song.findUniqueOrThrow({ where: { id: e.id } })
+       await db.job.update({
+          where: { id: song.jobId! },
+          data: { status: "IN_PROGRESS" }
+         })
       await step.run("check-credits", async () => {
+  
         if (user.credits < 1) {
           throw Error(`user does not have enough credits, current balance: ${user.credits}`)
         }
         
       });
       const params = await step.run('get-params', async () => {
+     
         // Modal class parameters must be passed as query parameters
         const imageModelName = "stabilityai/sdxl-turbo";
         const llmModelName = "Qwen/Qwen2.5-7B-Instruct";
+
         
         // Build the URL with query parameters for the Modal class
         const url = new URL("https://bongiboy777--musify-backend-musicmodelserver-generat-994822-dev.modal.run");
@@ -118,6 +128,14 @@ export const GenerateMusic = inngest.createFunction(
 
       const responseData = await fetchResponse.json();
       console.log("Received response data:", responseData);
+
+      await step.run("update-job-and-song", async () => {
+        await db.job.update({
+          where: { id: song.jobId! },
+          data: { status: "COMPLETED" }
+        });
+   
+      });
       
       return responseData
 

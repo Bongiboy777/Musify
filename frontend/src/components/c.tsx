@@ -4,14 +4,31 @@ import { Button } from './ui/button'
 import { title } from 'process';
 import type { GenerationParams } from '@/lib/types/generation-params';
 import { db } from '@/server/db';
+import { jobRouter } from '@/server/api/routers/job';
+import { api } from '@/trpc/react';
+import { JobStatus } from 'generated/prisma';
 
 const C = ({ userId }: { userId: string }) => {
     const [data, setData] = React.useState<any>(null);
-   
+    const [jobMessage, setJobMessage] = React.useState<string>(""); 
 
-    if (data){
-        console.log("Data received from API:", data);
-    }
+    const { data: jobData } = api.jobs.jobStatus.useQuery(
+        { jobId: data?.eventId ?? "" },
+        {
+            enabled: !!data?.eventId,
+            refetchInterval: (query) =>
+                query.state.data?.status === JobStatus.COMPLETED ||
+                query.state.data?.status === JobStatus.FAILED
+                    ? false
+                    : 1000,
+        }
+    );
+
+    React.useEffect(() => {
+        if (jobData?.status) {
+            setJobMessage(jobData.status);
+        }
+    }, [jobData?.status]);
 
     const requestGeneration = async () => {
         const songParams: GenerationParams =  {
@@ -39,8 +56,10 @@ const C = ({ userId }: { userId: string }) => {
           }),
         });
         const data = await res.json();
-        
-        setData(data);
+        console.log("Data received from API:", data);
+        if (data && data.eventId) {
+            setData(data);
+        }
         return data;
       }
 
@@ -50,7 +69,7 @@ const C = ({ userId }: { userId: string }) => {
       }
 
   return (
-    <Button onClick={handleClick}>{data && data.success ? data.song.title : 'Click me'}</Button>
+    <Button onClick={handleClick}>{jobMessage || 'Click me'}</Button>
   )
 }
 

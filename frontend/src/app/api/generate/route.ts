@@ -42,18 +42,36 @@ export async function POST(request: Request) {
             },
         });
 
-        console.log("Inngest response:", res);
-
         if (!res.ids || res.ids.length === 0) {
             return NextResponse.json(
                 { error: "Failed to create music generation event" },
                 { status: 500 }
             );
         }
-
         const eventId = res.ids[0]!;
 
+        console.log("Job Id:", eventId);
+        const job = await db.job.create({
+            data: {
+                id: eventId,
+                event: "user/generate.music",
+                payload: song,
+                status: "QUEUED"
+            }
+        })
 
+        await db.song.update({
+            where: { id: song.id },
+            data: { jobId: job.id }
+        })
+
+        const songStatus = await db.song.findUnique({
+            where: { id: song.id },
+            select: { jobId: true }
+        })
+
+        console.log(`Song created with ID: ${song.id}, associated Job ID: ${songStatus?.jobId}`);    
+      
 
         return NextResponse.json({ message: `Music generation event sent! ${song.describedPrompt}`, song: song, success: true, eventId: eventId });
     } catch (error) {

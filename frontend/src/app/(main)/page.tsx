@@ -12,11 +12,10 @@ import C from "@/components/c";
 import { db } from "@/server/db";
 
 export default async function Home() {
-  const hello = await api.post.getLatest();
+  const hello = await api.post.hello({text: "from tRPC"});
   const session = await auth.api.getSession({
     headers: await headers()
   })
-  void api.post.getLatest.prefetch();
 
   if (!session){
     redirect('auth/sign-in')
@@ -65,7 +64,7 @@ export default async function Home() {
           </div>
           <div className="flex flex-col items-center gap-2">
             <p className="text-2xl text-white">
-              {hello ? hello.name : "Loading tRPC query..."}
+              {hello ? hello.greeting : "Loading tRPC query..."}
             </p>
           </div>
         </div>
