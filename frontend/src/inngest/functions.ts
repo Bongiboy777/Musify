@@ -118,6 +118,7 @@ export const GenerateMusic = inngest.createFunction(
 
       const responseData = await fetchResponse.json();
       console.log("Received response data:", responseData);
+      
       return responseData
 
     }

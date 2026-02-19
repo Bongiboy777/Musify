@@ -54,6 +54,8 @@ class GeneratedMusicResponse(BaseModel):
 
 
 class GeneratedMusicResponseS3(BaseModel):
+    fullPrompt: str = modal.parameter()
+    fullLyrics: str = modal.parameter()
     s3_audio_path: str = modal.parameter()
     s3_image_path: str = modal.parameter()
     categories: list[str] = modal.parameter()
@@ -309,8 +311,8 @@ class MusicModelServer:
         music_out_name = f"{id}.wav"
         img_out_name = f"{id}.png"
 
-        img_cloud_path: str = f"{img_cloud_dir}/{img_out_name}"
-        music_cloud_path: str = f"{music_cloud_dir}/{music_out_name}"
+        img_cloud_path: str = f"{img_cloud_dir}/images/{img_out_name}"
+        music_cloud_path: str = f"{music_cloud_dir}/music/{music_out_name}"
         music_out_path: str = f"tmp/out/{music_out_name}"
         img_out_path: str = f"tmp/out/{img_out_name}"
         
@@ -362,18 +364,9 @@ class MusicModelServer:
         self.upload_to_s3(music_out_path, self.s3_bucket_name, music_cloud_path)
         print(f"uploaded music to s3 at path: {music_cloud_path}")
          # read the audio file and encode it to base64
-
-        try:
-            with open(music_out_path, "rb") as f:
-                out_bytes = f.read()
-            out_bytes = base64.b64encode(out_bytes)
-            out_str = out_bytes.decode("utf-8")
-            os.remove(img_out_path)
-            os.remove(music_out_path)
-        except Exception as e:
-            logger = logging.getLogger("Musify.MusicModelServer.generateAndPostToS3")
-            logger.exception("Error decoding audio file: %s", e)
-            raise
+        os.remove(img_out_path)
+        os.remove(music_out_path)
+  
         return GeneratedMusicResponseS3(
             fullPrompt=formatted_prompt,
             fullLyrics=formatted_lyrics,

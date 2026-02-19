@@ -4,6 +4,8 @@ import type { GenerationParams } from "@/lib/types/generation-params";
 import { db } from "@/server/db";
 import { success } from "zod";
 export const dynamic = "force-dynamic";
+import { getRuns } from "@/lib/utils";
+import { get } from "http";
 
 // Create a simple async Next.js API route handler
 export async function POST(request: Request) {
@@ -42,7 +44,18 @@ export async function POST(request: Request) {
 
         console.log("Inngest response:", res);
 
-        return NextResponse.json({ message: `Music generation event sent! ${song.describedPrompt}`, song: song, success: true });
+        if (!res.ids || res.ids.length === 0) {
+            return NextResponse.json(
+                { error: "Failed to create music generation event" },
+                { status: 500 }
+            );
+        }
+
+        const eventId = res.ids[0]!;
+
+
+
+        return NextResponse.json({ message: `Music generation event sent! ${song.describedPrompt}`, song: song, success: true, eventId: eventId });
     } catch (error) {
         console.error("Error:", error);
         return NextResponse.json(
