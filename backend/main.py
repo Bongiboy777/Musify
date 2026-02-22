@@ -6,6 +6,7 @@ import os
 import torch
 import requests
 from pydantic import BaseModel
+from fastapi import Query
 import base64
 from acestep.pipeline_ace_step import ACEStepPipeline
 from diffusers.pipelines.auto_pipeline import AutoPipelineForText2Image
@@ -193,6 +194,8 @@ class MusicModelServer:
         # self.image_refiner.to("cuda")
         print("MusicModelServer initialization complete")
 
+
+    @modal.fastapi_endpoint(method="POST", requires_proxy_auth=True)
     def generate_categories_from_prompt(self, prompt: str) -> list[str]:
         from prompts import CATEGORY_PROMPT_TEMPLATE
 
@@ -219,10 +222,14 @@ class MusicModelServer:
         response = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
         return [cat.strip() for cat in response.split(",") if cat.strip()]
 
+    @modal.fastapi_endpoint(method="POST", requires_proxy_auth=True)
     def format_img_prompt(self, prompt: str) -> str:
+        """Takes a user prompt and returns a formatted image generation prompt."""
         return f"{prompt} ALBUM COVER ART"
-    
-    def format_music_prompt(self, prompt: str, lyrics: str) -> str:
+
+    @modal.fastapi_endpoint(method="POST", requires_proxy_auth=True)
+    def format_music_prompt(self, prompt: str) -> str:
+        """Takes a raw user prompt and returns a detailed music generation prompt via LLM."""
         from prompts import MUSIC_PROMPT_TEMPLATE_NO_LYRICS
 
         print(f"format_music_prompt: Input prompt length: {len(prompt)}")
@@ -239,24 +246,23 @@ class MusicModelServer:
         )
         print(f"format_music_prompt: Chat template applied, text length: {len(text)}")
         model_inputs = self.tokenizer([text], return_tensors="pt").to(self.language_model.device)
-        print(f"format_music_prompt: Model inputs prepared")
+        print("format_music_prompt: Model inputs prepared")
 
         generated_ids = self.language_model.generate(
             **model_inputs,
             max_new_tokens=512
         )
-        print(f"format_music_prompt: Generation complete")
+        print("format_music_prompt: Generation complete")
         generated_ids = [
             output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
         ]
 
         response = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
         print(f"format_music_prompt: Response decoded, length: {len(response)}")
-
-        full_prompt = f"{formatted_prompt}\n\n{lyrics}"
-        return response  
+        return response
     
 
+    @modal.fastapi_endpoint(method="POST", requires_proxy_auth=True)
     def format_lyrics(self, lyrics: str) -> str:
         from prompts import STRUCTURE_LYRICS_TEMPLATE
 
@@ -287,47 +293,71 @@ class MusicModelServer:
 
         response = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
         print(f"format_lyrics: Response decoded, length: {len(response)}")
-        
-        full_prompt = f"{formatted_prompt}\n\n{lyrics}"
-        return response  
+        return response
+
+    @modal.fastapi_endpoint(method="POST", requires_proxy_auth=True)
+    def generate_album_image(
+        self,
+        prompt: str,
+        img_cloud_dir: str = "out",
+    ) -> str:
+        """Takes a raw user prompt, generates an album cover image, uploads to S3 and returns the S3 path."""
+        id = uuid.uuid4()
+        img_out_name = f"{id}.png"
+        img_cloud_path: str = f"{img_cloud_dir}/images/{img_out_name}"
+        img_out_path: str = f"tmp/out/{img_out_name}"
+
+        os.makedirs("tmp/out", exist_ok=True)
+
+        print(f"generate_album_image: Generating image for prompt: {prompt}")
+        image = self.image_model(
+            prompt=f"{prompt} ALBUM COVER ART",
+            num_inference_steps=25,
+            guidance_scale=7.5,
+        ).images[0]
+        image.save(img_out_path)
+        print(f"generate_album_image: Image saved to {img_out_path}")
+
+        self.upload_to_s3(img_out_path, self.s3_bucket_name, img_cloud_path)
+        print(f"generate_album_image: Image uploaded to s3 at {img_cloud_path}")
+        os.remove(img_out_path)
+        return img_cloud_path
     
     @modal.fastapi_endpoint(method='POST')
     def testModalEndpoint(self):
         print(f'testModalEndpoint called')
         return TestResponse(message="This is a test response from the Modal endpoint!")
+    
+
     @modal.fastapi_endpoint(method="POST", requires_proxy_auth=True)
     def generateAndPostToS3(
         self,
-        prompt: str = "Vintage retro keys sample Chick corea",
-        lyrics: str = "[Instrumental]",
+        formatted_prompt: str,
+        formatted_lyrics: str,
+        categories: list[str] = Query(default=[]),
+        img_s3_path: str = "",
         audio_duration: float = 180,
         infer_step: int = 60,
         guidance_scale: int = 15,
         scheduler_type: str = "euler",
         music_cloud_dir: str = "out",
-        img_cloud_dir: str = "out",
     ) -> GeneratedMusicResponseS3:
+        """
+        Final generation step. Expects fully pre-formatted prompt, lyrics, categories
+        and a pre-generated image S3 path. Generates music and uploads to S3.
+        Call format_music_prompt, format_lyrics, generate_categories_from_prompt,
+        and generate_album_image first, then pass results here.
+        """
         id = uuid.uuid4()
         music_out_name = f"{id}.wav"
-        img_out_name = f"{id}.png"
-
-        img_cloud_path: str = f"{img_cloud_dir}/images/{img_out_name}"
         music_cloud_path: str = f"{music_cloud_dir}/music/{music_out_name}"
         music_out_path: str = f"tmp/out/{music_out_name}"
-        img_out_path: str = f"tmp/out/{img_out_name}"
-        
-        print(f"aws bucket key id: {os.getenv('musify_backend_key_id')}")
 
-        formatted_prompt = self.format_music_prompt(prompt, lyrics)
-        print(f"formatted_prompt: {formatted_prompt}")
-        categories = self.generate_categories_from_prompt(prompt)
-        print(f"categories: {categories}")
-        formatted_lyrics = self.format_lyrics(lyrics) if lyrics != "[Instrumental]" else lyrics
-        print(f"formatted_lyrics: {formatted_lyrics}")
+        os.makedirs("tmp/out", exist_ok=True)
 
+        print("generateAndPostToS3: Starting music generation")
+        print(f"generateAndPostToS3: prompt length={len(formatted_prompt)}, lyrics length={len(formatted_lyrics)}")
 
-
-        # generating music
         self.music_model(
             format="wav",
             audio_duration=audio_duration,
@@ -337,42 +367,22 @@ class MusicModelServer:
             scheduler_type=scheduler_type,
             guidance_scale=guidance_scale,
             save_path=music_out_path,
-            
         )
+        print(f"generateAndPostToS3: Music generation complete, saved to {music_out_path}")
 
-        image = self.image_model(
-            prompt=f"{prompt} ALBUM COVER ART",
-            num_inference_steps=25,
-            guidance_scale=7.5,
-        ).images[0]
-
-        image.save(img_out_path)
-
-        print(f"getting bucket name")
-        """
-        created iam users in aws, and policys get and put object for these users. Access keys were created for each user, 
-        these access key secrets are used to authenticate to aws.
-        """
-        print(f"bucket name retireved as: {self.s3_bucket_name}")
-        print(f"starting s3 client")
-
-        image_prompt = f"{prompt} album cover art"
-
-        print(f"uploading files to s3 bucket: {self.s3_bucket_name}, from paths: {img_out_path}, {music_out_path}")
-        self.upload_to_s3(img_out_path, self.s3_bucket_name, img_cloud_path)
-        print(f"uploaded image to s3 at path: {img_cloud_path}")
+        print(f"generateAndPostToS3: Uploading music to s3 bucket: {self.s3_bucket_name}")
         self.upload_to_s3(music_out_path, self.s3_bucket_name, music_cloud_path)
-        print(f"uploaded music to s3 at path: {music_cloud_path}")
-         # read the audio file and encode it to base64
-        os.remove(img_out_path)
+        print(f"generateAndPostToS3: Music uploaded to s3 at path: {music_cloud_path}")
+
         os.remove(music_out_path)
-  
+
         return GeneratedMusicResponseS3(
             fullPrompt=formatted_prompt,
             fullLyrics=formatted_lyrics,
             s3_audio_path=music_cloud_path,
-            s3_image_path=img_cloud_path,
-            categories=categories)
+            s3_image_path=img_s3_path,
+            categories=categories,
+        )
 
 @app.local_entrypoint()
 def main():
@@ -449,8 +459,7 @@ def SendAndProcessRequest(endpoint_url, image_model_name, llm_model_name):
             raise ValueError("Empty response from endpoint")
 
         try:
-            response_json = response.json()
-            # print("Response JSON: %s", response_json[:10])
+            response.json()
         except Exception as e:
             logger.error(
                 "Failed to parse response as JSON. Error: %s. Response text: %s",

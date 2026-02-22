@@ -56,7 +56,8 @@ export async function POST(request: Request) {
                 id: eventId,
                 event: "user/generate.music",
                 payload: song,
-                status: "QUEUED"
+                status: "QUEUED",
+                inngestId: eventId
             }
         })
 
@@ -73,7 +74,7 @@ export async function POST(request: Request) {
         console.log(`Song created with ID: ${song.id}, associated Job ID: ${songStatus?.jobId}`);    
       
 
-        return NextResponse.json({ message: `Music generation event sent! ${song.describedPrompt}`, song: song, success: true, eventId: eventId });
+        return NextResponse.json({ message: `Music generation event sent! ${song.describedPrompt}`, song: song,  eventId: eventId });
     } catch (error) {
         console.error("Error:", error);
         return NextResponse.json(

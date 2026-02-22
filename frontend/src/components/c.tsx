@@ -12,7 +12,7 @@ const C = ({ userId }: { userId: string }) => {
     const [data, setData] = React.useState<any>(null);
     const [jobMessage, setJobMessage] = React.useState<string>(""); 
 
-    const { data: jobData } = api.jobs.jobStatus.useQuery(
+    const jobData = api.jobs.jobStatus.useQuery(
         { jobId: data?.eventId ?? "" },
         {
             enabled: !!data?.eventId,
@@ -20,15 +20,15 @@ const C = ({ userId }: { userId: string }) => {
                 query.state.data?.status === JobStatus.COMPLETED ||
                 query.state.data?.status === JobStatus.FAILED
                     ? false
-                    : 1000,
+                    : 2000,
         }
     );
 
     React.useEffect(() => {
-        if (jobData?.status) {
-            setJobMessage(jobData.status);
+        if (jobData?.data && jobData.data.status) {
+            setJobMessage(jobData.data.status);
         }
-    }, [jobData?.status]);
+    }, [jobData?.data]);
 
     const requestGeneration = async () => {
         const songParams: GenerationParams =  {
