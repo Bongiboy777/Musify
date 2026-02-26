@@ -3,27 +3,12 @@ import { db } from '@/server/db'
 import { headers } from 'next/headers'
 import React from 'react'
 
-const Credits = async () => {
-  const authHeaders = await headers();
-  const session = await auth.api.getSession(
-    {
+const Credits = async ({credits}: {credits: number}) => {
 
-      headers: authHeaders
-    }
-  )
-
-  const credits = await db.user.findUnique({
-    where: {
-      id: session!.user.id
-    },
-     select: {
-      credits: true
-     }
-  })
 
 
   return (
-    <div>{credits ? <>{credits.credits}<span className='text-slate-300 italic font-light'>Credits</span> </> : "No credits found"}</div>
+    <p className='font-semibold'>{credits}<span className='text-muted-foreground italic font-light'>Credits</span></p>
   )
 
 }

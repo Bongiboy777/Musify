@@ -12,8 +12,30 @@ import NavLinks from "./nav-links"
 import { UserButton } from "@daveyplate/better-auth-ui"
 import Credits from "./credits"
 import UpgradeButton from "./upgrade-button"
+import { auth } from '@/lib/auth'
+import { db } from '@/server/db'
+import { headers } from 'next/headers'
+import { User } from "lucide-react"
+export async function AppSidebar() {
 
-export function AppSidebar() {
+  const authHeaders = await headers();
+  const session = await auth.api.getSession(
+    {
+
+      headers: authHeaders
+    }
+  )
+
+  const credits = session ? await db.user.findUnique({
+    where: {
+      id: session!.user.id
+    },
+     select: {
+      credits: true
+     }
+  }) : null;
+
+
   return (
     <Sidebar>
       <SidebarHeader title="Musify" className="text-2xl flex font-black items-center justify-start  uppercase">
@@ -28,15 +50,19 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
     <SidebarMenu>
-      <SidebarMenuItem className="flex flex-row mx-auto items-center gap-4">
-         <Credits />
+
+     
+      <SidebarMenuItem className="flex flex-row mx-auto items-center gap-4 px-4 w-full">
+         {credits && <Credits credits={credits.credits} />}
           <UpgradeButton />
       </SidebarMenuItem>
-                <Separator orientation="horizontal" className="my-6" />
+                <Separator orientation="horizontal" className="my-2" />
 
-    <SidebarMenuItem className="flex items-center justify-center ">
-      <p className="text-sm text-muted-foreground text-center">© 2023 Musify</p>
-    </SidebarMenuItem>
+       <SidebarMenuItem className="flex flex-row w-full items-center">
+         <UserButton className="flex-1" variant={"outline"} additionalLinks={[{label:'User portal', icon:<User/>, href:'/profile'}]}/>
+      </SidebarMenuItem>
+
+  
     </SidebarMenu>
   </SidebarFooter>
    

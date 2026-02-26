@@ -32,11 +32,10 @@ export default async function Home() {
 
   return (
     <HydrateClient>
-      <main className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="bg-amber-700 z-50 container text-center flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <p className="text-blue-600 dark:text-sky-400">The quick brown fox...</p>
-             <h1 className="text-2xl font-black underline">
-            Welcome home <span className="text-[hsl(73,61%,66%)]">{session && session.user ?session.user.name : "Guest"}</span>.
+      <main className="flex min-h-screen w-full flex-col bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
+        <div className="container text-center flex flex-col w-full items-center justify-center gap-12 px-4 py-16">
+             <h1 className="text-8xl font-black">
+            Welcome home <span className="text-[hsl(280,61%,66%)]">{session && session.user ?session.user.name : "Guest"}</span>.
           </h1>
         </div>
       </main>
