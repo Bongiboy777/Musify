@@ -121,10 +121,18 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/50 box-content;
   }
   body {
     @apply bg-background text-foreground;
   }
+}
+
+* {
+  box-sizing: content-box;
+}
+
+button{
+  cursor: pointer;
 }
 
