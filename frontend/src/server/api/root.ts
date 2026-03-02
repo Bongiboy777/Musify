@@ -9,7 +9,7 @@ import { jobRouter } from "./routers/job";
  */
 export const appRouter = createTRPCRouter({
   post: postRouter,
-  jobs: jobRouter
+  jobs: jobRouter,
 });
 
 // export type definition of API

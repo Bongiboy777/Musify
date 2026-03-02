@@ -3,9 +3,9 @@ import { db } from "@/server/db";
 import { JobStatus } from "../../generated/prisma";
 
 interface GenerateEventData {
-  userId: string,
-  id: string,
-  jobId: string
+  userId: string;
+  id: string;
+  jobId: string;
 }
 
 enum RequestTypes {
@@ -43,7 +43,11 @@ export const GenerateMusic = inngest.createFunction(
   async ({ event, step }) => {
     await step.sleep("wait-a-moment", "1s");
 
-    const e = { userId: event.data.userId, id: event.data.id, jobId: event.id } as GenerateEventData;
+    const e = {
+      userId: event.data.userId,
+      id: event.data.id,
+      jobId: event.id,
+    } as GenerateEventData;
 
     const user = await db.user.findUniqueOrThrow({ where: { id: e.userId } });
     const song = await db.song.findUniqueOrThrow({ where: { id: e.id } });
@@ -54,11 +58,16 @@ export const GenerateMusic = inngest.createFunction(
       console.log("GenerateMusic: Received event data:", event.data);
 
       // --- PREPARATION ---
-      await db.job.update({ where: { id: e.jobId }, data: { status: JobStatus.PREPARATION } });
+      await db.job.update({
+        where: { id: e.jobId },
+        data: { status: JobStatus.PREPARATION },
+      });
 
       await step.run("check-credits", async () => {
         if (user.credits < 1) {
-          throw Error(`User does not have enough credits, current balance: ${user.credits}`);
+          throw Error(
+            `User does not have enough credits, current balance: ${user.credits}`,
+          );
         }
       });
 
@@ -74,65 +83,131 @@ export const GenerateMusic = inngest.createFunction(
       }).toString();
 
       // --- STEP 2: FORMAT PROMPT ---
-      await db.job.update({ where: { id: e.jobId }, data: { status: JobStatus.FORMATTING_PROMPT } });
-
-      const formattedPrompt = await step.run("format-music-prompt", async () => {
-        const url = new URL(`${process.env.MODAL_ENDPOINT_FORMAT_MUSIC_PROMPT}`);
-        url.search = new URLSearchParams({ ...Object.fromEntries(new URLSearchParams(classParams)), prompt: rawPrompt }).toString();
-        const res = await fetch(url.toString(), { method: "POST", headers: MODAL_HEADERS, body: "{}" });
-        if (!res.ok) throw Error(`format_music_prompt failed: ${await res.text()}`);
-        return res.json() as Promise<string>;
+      await db.job.update({
+        where: { id: e.jobId },
+        data: { status: JobStatus.FORMATTING_PROMPT },
       });
 
-      console.log("GenerateMusic: Prompt formatted, length:", formattedPrompt.length);
+      const formattedPrompt = await step.run(
+        "format-music-prompt",
+        async () => {
+          const url = new URL(
+            `${process.env.MODAL_ENDPOINT_FORMAT_MUSIC_PROMPT}`,
+          );
+          url.search = new URLSearchParams({
+            ...Object.fromEntries(new URLSearchParams(classParams)),
+            prompt: rawPrompt,
+          }).toString();
+          const res = await fetch(url.toString(), {
+            method: "POST",
+            headers: MODAL_HEADERS,
+            body: "{}",
+          });
+          if (!res.ok)
+            throw Error(`format_music_prompt failed: ${await res.text()}`);
+          return res.json() as Promise<string>;
+        },
+      );
+
+      console.log(
+        "GenerateMusic: Prompt formatted, length:",
+        formattedPrompt.length,
+      );
 
       // --- STEP 3: FORMAT LYRICS (skip if instrumental) ---
       let formattedLyrics = "[Instrumental]";
       if (!isInstrumental) {
-        await db.job.update({ where: { id: e.jobId }, data: { status: JobStatus.FORMATTING_LYRICS } });
+        await db.job.update({
+          where: { id: e.jobId },
+          data: { status: JobStatus.FORMATTING_LYRICS },
+        });
 
         formattedLyrics = await step.run("format-lyrics", async () => {
           const url = new URL(`${process.env.MODAL_ENDPOINT_FORMAT_LYRICS}`);
-          url.search = new URLSearchParams({ ...Object.fromEntries(new URLSearchParams(classParams)), lyrics: rawLyrics }).toString();
-          const res = await fetch(url.toString(), { method: "POST", headers: MODAL_HEADERS, body: "{}" });
+          url.search = new URLSearchParams({
+            ...Object.fromEntries(new URLSearchParams(classParams)),
+            lyrics: rawLyrics,
+          }).toString();
+          const res = await fetch(url.toString(), {
+            method: "POST",
+            headers: MODAL_HEADERS,
+            body: "{}",
+          });
           if (!res.ok) throw Error(`format_lyrics failed: ${await res.text()}`);
           return res.json() as Promise<string>;
         });
 
-        console.log("GenerateMusic: Lyrics formatted, length:", formattedLyrics.length);
+        console.log(
+          "GenerateMusic: Lyrics formatted, length:",
+          formattedLyrics.length,
+        );
       }
 
       // --- STEPS 4 & 5: GENERATE CATEGORIES + ALBUM IMAGE (parallel) ---
-      await db.job.update({ where: { id: e.jobId }, data: { status: JobStatus.GENERATING_CATEGORIES } });
+      await db.job.update({
+        where: { id: e.jobId },
+        data: { status: JobStatus.GENERATING_CATEGORIES },
+      });
 
       const categories = await step.run("generate-categories", async () => {
-        const url = new URL(`${process.env.MODAL_ENDPOINT_GENERATE_CATEGORIES}`);
-        url.search = new URLSearchParams({ ...Object.fromEntries(new URLSearchParams(classParams)), prompt: rawPrompt }).toString();
-        const res = await fetch(url.toString(), { method: "POST", headers: MODAL_HEADERS, body: "{}" });
-        if (!res.ok) throw Error(`generate_categories_from_prompt failed: ${await res.text()}`);
+        const url = new URL(
+          `${process.env.MODAL_ENDPOINT_GENERATE_CATEGORIES}`,
+        );
+        url.search = new URLSearchParams({
+          ...Object.fromEntries(new URLSearchParams(classParams)),
+          prompt: rawPrompt,
+        }).toString();
+        const res = await fetch(url.toString(), {
+          method: "POST",
+          headers: MODAL_HEADERS,
+          body: "{}",
+        });
+        if (!res.ok)
+          throw Error(
+            `generate_categories_from_prompt failed: ${await res.text()}`,
+          );
         return res.json() as Promise<string[]>;
       });
 
       console.log("GenerateMusic: Categories generated:", categories);
 
-      await db.job.update({ where: { id: e.jobId }, data: { status: JobStatus.GENERATING_IMAGE } });
+      await db.job.update({
+        where: { id: e.jobId },
+        data: { status: JobStatus.GENERATING_IMAGE },
+      });
 
       const imgS3Path = await step.run("generate-album-image", async () => {
-        const url = new URL(`${process.env.MODAL_ENDPOINT_GENERATE_ALBUM_IMAGE}`);
-        url.search = new URLSearchParams({ ...Object.fromEntries(new URLSearchParams(classParams)), prompt: rawPrompt, img_cloud_dir: cloudDir }).toString();
-        const res = await fetch(url.toString(), { method: "POST", headers: MODAL_HEADERS, body: "{}" });
-        if (!res.ok) throw Error(`generate_album_image failed: ${await res.text()}`);
+        const url = new URL(
+          `${process.env.MODAL_ENDPOINT_GENERATE_ALBUM_IMAGE}`,
+        );
+        url.search = new URLSearchParams({
+          ...Object.fromEntries(new URLSearchParams(classParams)),
+          prompt: rawPrompt,
+          img_cloud_dir: cloudDir,
+        }).toString();
+        const res = await fetch(url.toString(), {
+          method: "POST",
+          headers: MODAL_HEADERS,
+          body: "{}",
+        });
+        if (!res.ok)
+          throw Error(`generate_album_image failed: ${await res.text()}`);
         return res.json() as Promise<string>;
       });
 
       console.log("GenerateMusic: Album image generated at:", imgS3Path);
 
       // --- STEP 6: GENERATE MUSIC + UPLOAD TO S3 ---
-      await db.job.update({ where: { id: e.jobId }, data: { status: JobStatus.GENERATING_MUSIC } });
+      await db.job.update({
+        where: { id: e.jobId },
+        data: { status: JobStatus.GENERATING_MUSIC },
+      });
 
       const musicResponse = await step.fetch(
         (() => {
-          const url = new URL(`${process.env.MODAL_ENDPOINT_GENERATE_AND_POST_S3}`);
+          const url = new URL(
+            `${process.env.MODAL_ENDPOINT_GENERATE_AND_POST_S3}`,
+          );
           const params = new URLSearchParams({
             ...Object.fromEntries(new URLSearchParams(classParams)),
             formatted_prompt: formattedPrompt,
@@ -145,19 +220,21 @@ export const GenerateMusic = inngest.createFunction(
             music_cloud_dir: cloudDir,
           });
           // FastAPI expects repeated query params for list fields
-          categories.forEach(cat => params.append("categories", cat));
+          categories.forEach((cat) => params.append("categories", cat));
           url.search = params.toString();
           return url.toString();
         })(),
-        { method: "POST", headers: MODAL_HEADERS }
+        { method: "POST", headers: MODAL_HEADERS },
       );
 
       if (!musicResponse.ok) {
         const errorText = await musicResponse.text();
-        throw Error(`generateAndPostToS3 failed (${musicResponse.status}): ${errorText}`);
+        throw Error(
+          `generateAndPostToS3 failed (${musicResponse.status}): ${errorText}`,
+        );
       }
 
-      const responseData = await musicResponse.json() as {
+      const responseData = (await musicResponse.json()) as {
         fullPrompt: string;
         fullLyrics: string;
         s3_audio_path: string;
@@ -206,7 +283,6 @@ export const GenerateMusic = inngest.createFunction(
       });
 
       return responseData;
-
     } catch (err) {
       await db.job.update({
         where: { id: e.jobId },
@@ -219,9 +295,11 @@ export const GenerateMusic = inngest.createFunction(
         },
       });
 
-      throw Error(`Error in GenerateMusic: ${err instanceof Error ? err.message : String(err)}`);
+      throw Error(
+        `Error in GenerateMusic: ${err instanceof Error ? err.message : String(err)}`,
+      );
     }
-  }
+  },
 );
 
 export const helloWorld = inngest.createFunction(
@@ -232,4 +310,3 @@ export const helloWorld = inngest.createFunction(
     return { message: `Hello ${event.data.email}!` };
   },
 );
-  

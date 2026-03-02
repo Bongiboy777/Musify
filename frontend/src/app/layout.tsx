@@ -1,10 +1,14 @@
-import "@/styles/globals.css"
+import "@/styles/globals.css";
 
 import { type Metadata } from "next";
 import { Atma } from "next/font/google";
 
 import { Providers } from "@/app/(main)/providers";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebr";
 import { Separator } from "@/components/ui/separator";
 import NavBreadcrumbs from "@/components/nav-breadcrumbs";
@@ -21,8 +25,6 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -32,18 +34,19 @@ export default function RootLayout({
         <Providers>
           <SidebarProvider>
             <AppSidebar />
-              <SidebarInset className="flex flex-col h-screen">
-                    <header className="sticky-top z-10 border-b bg-background py-2 justify-start items-center flex gap-2">
+            <SidebarInset className="flex h-screen flex-col">
+              <header className="sticky-top bg-background z-10 flex items-center justify-start gap-2 border-b py-2">
+                <SidebarTrigger />
+                <Separator
+                  orientation="vertical"
+                  className="dat-[orientation=vertical] -ml-1"
+                />
+                <NavBreadcrumbs />
+              </header>
 
-                      <SidebarTrigger />
-                                            <Separator orientation="vertical" className="-ml-1 dat-[orientation=vertical]" />
-                                            <NavBreadcrumbs />
-
-                    </header>
-
-                <main className="flex-1 overflow-y-auto">{children}</main>
-              </SidebarInset>
-            </SidebarProvider>
+              <main className="flex-1 overflow-y-auto">{children}</main>
+            </SidebarInset>
+          </SidebarProvider>
         </Providers>
       </body>
     </html>

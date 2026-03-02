@@ -11,7 +11,7 @@ export const env = createEnv({
     AWS_ACCESS_KEY_ID: z.string().min(1, "AWS_ACCESS_KEY_ID is required"),
     AWS_SECRET_ACCESS_KEY: z
       .string()
-      .min(1, "AWS_SECRET_ACCESS_KEY is required"), 
+      .min(1, "AWS_SECRET_ACCESS_KEY is required"),
     MODAL_PROXY_SECRET: z.string().min(1, "MODAL_SECRET is required"),
     MODAL_PROXY_KEY: z.string().min(1, "MODAL_KEY is required"),
     S3_BUCKET_NAME: z.string().min(1, "S3_BUCKET_NAME is required"),
@@ -23,9 +23,8 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
-
   },
- 
+
   /**
    * Specify your client-side environment variables schema here. This way you can ensure the app
    * isn't built with invalid env vars. To expose them to the client, prefix them with
