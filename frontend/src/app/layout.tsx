@@ -36,14 +36,12 @@ export default async function RootLayout({
       headers: await headers(),
     });
   
-    if (!session) {
-      redirect("auth/sign-in");
-    }
+  
   
     setInterval(async () => {
       await db.user.findUniqueOrThrow({
         where: {
-          id: session.user.id,
+          id: session!.user.id,
         },
       });
     }, 240000);
@@ -58,7 +56,7 @@ export default async function RootLayout({
                 <SidebarTrigger />
                 <Separator
                   orientation="vertical"
-                  className="dat-[orientation=vertical] -ml-1"
+                  className="dat-[orientation=vertical]"
                 />
                 <NavBreadcrumbs />
               </header>
