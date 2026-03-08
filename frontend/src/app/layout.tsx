@@ -12,6 +12,10 @@ import {
 import { AppSidebar } from "@/components/app-sidebr";
 import { Separator } from "@/components/ui/separator";
 import NavBreadcrumbs from "@/components/nav-breadcrumbs";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { db } from "@/server/db";
 
 const atma = Atma({
   subsets: ["latin"],
@@ -25,9 +29,24 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+  
+    if (!session) {
+      redirect("auth/sign-in");
+    }
+  
+    setInterval(async () => {
+      await db.user.findUniqueOrThrow({
+        where: {
+          id: session.user.id,
+        },
+      });
+    }, 240000);
   return (
     <html lang="en" className={`${atma.variable}`}>
       <body>

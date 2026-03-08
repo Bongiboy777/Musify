@@ -5,17 +5,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
-import { Minus, Plus } from "lucide-react";
+import { Loader, Minus, Music, Plus } from "lucide-react";
 import { Switch } from "./ui/switch";
+import { Badge } from "./ui/badge";
+import { Separator } from "radix-ui";
 
 const SongPanel = () => {
   // Shared components
   const [mode, setMode] = useState<"simple" | "custom">("simple");
   const [description, setDescription] = useState<string>("");
-  const [Instrumental, setInstrumental] = useState<boolean>(false);
+  const [isInstrumental, setIsInstrumental] = useState<boolean>(false);
   const [tags, setTags] = useState<string[]>([]);
-  const [customModeFullyrics, setcustomModeFullLyrics] =
-    useState<boolean>(false);
+  const [customModeFullyrics, setcustomModeFullLyrics] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  setInterval(() => {setIsLoading(false)}, 5000)
 
   const categories = [
     "Retro",
@@ -27,7 +30,7 @@ const SongPanel = () => {
     "Psychadelic Rock",
     "Smooth",
     "Cinematic",
-  ];
+  ].map(c => c.toLocaleLowerCase());
 
   const handeDescriptionChange = (desc: string) => {
     setDescription(desc);
@@ -35,9 +38,9 @@ const SongPanel = () => {
       .split(",")
       .map((t) => t.trim())
       .filter((t) => t.length > 0);
-    allTags = allTags.concat(tags);
+    allTags = allTags.concat(tags).map(c => c.toLocaleLowerCase());
     allTags = Array.from(new Set(allTags));
-    setTags(allTags.filter((t) => desc.includes(t)));
+    setTags(allTags.filter((t) => desc.toLocaleLowerCase().includes(t)));
   };
 
   const handleTagClick = (tag: string) => {
@@ -46,27 +49,33 @@ const SongPanel = () => {
       .map((t) => t.trim())
       .filter((t) => t.length > 0);
     allTags = allTags.concat(tags);
-    allTags = Array.from(new Set(allTags));
+    allTags = Array.from(new Set(allTags)).map(c => c.toLocaleLowerCase());
     if (!allTags.includes(tag)) {
       setTags([...tags, tag]);
       setDescription(description + `, ${tag}`);
     } else {
-      let newTags = tags.filter((t) => t !== tag);
+      let newTags = tags.map(c => c.toLocaleLowerCase()).filter((t) => t !== tag);
       setTags(newTags);
       setDescription(description.replace(`, ${tag}`, ""));
     }
   };
 
+    async function handleSubmitSong(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<any> {
+        setIsLoading(true);
+        const res = fetch('api/generate', { method: 'POST' });
+        await new Promise(resolve => setTimeout(resolve, 4000));
+    }
+
   return (
-    <div className="flex w-full max-w-3xl flex-col gap-4 rounded-lg p-8">
+    <div className="flex border-r bg-muted h-svh w-fit px-8 max-w-md flex-col items-center gap-y-4 rounded-lg p-8">
       <Tabs
         defaultValue="simple"
         value={mode}
         onValueChange={(m) => setMode(m as "simple" | "custom")}
-        className="flex w-full flex-col items-center"
+        className="flex w-full flex-col items-center mx-auto"
       >
         {/* tab triggers */}
-        <TabsList className="text-centeritems-center grid w-fit grid-cols-2 justify-between border-b-2 bg-transparent">
+        <TabsList className="text-center items-center grid w-fit grid-cols-2 justify-between border-b-2 bg-transparent">
           <TabsTrigger value="simple" className="px-8 font-bold tracking-wide">
             Simple
           </TabsTrigger>
@@ -77,14 +86,13 @@ const SongPanel = () => {
 
         {/* simple mode tab */}
 
-        <TabsContent value="simple" className="mt-4 flex w-full flex-col gap-4">
-          <Label className="text-2xl font-black">
+        <TabsContent value="simple" className="mt-4 flex w-full flex-col gap-y-4 items-center">
+          <Label className="text-2xl font-black self-start">
             Let the vibe be your guide ...
           </Label>
           <Textarea
             value={description}
             onChange={(desc) => handeDescriptionChange(desc.target.value)}
-            minLength={15}
             maxLength={400}
             placeholder="Enter song details here..."
             className="w-full resize-none"
@@ -101,8 +109,8 @@ const SongPanel = () => {
             <div className="flex items-center gap-x-2">
               <Label>Instrumental?</Label>
               <Switch
-                checked={Instrumental}
-                onCheckedChange={(e) => setInstrumental(e)}
+                checked={isInstrumental}
+                onCheckedChange={(e) => setIsInstrumental(e)}
                 className="w-fit cursor-pointer justify-self-end bg-amber-600"
               />
             </div>
@@ -128,8 +136,9 @@ const SongPanel = () => {
         </TabsContent>
 
         {/* custom mode tab */}
-        <TabsContent value="custom" className="mt-4 flex w-full flex-col gap-4">
-          <Label className="text-2xl font-black">Lets get descriptive</Label>
+
+        <TabsContent value="custom" className="mt-4 flex w-full flex-col gap-y-4 items-center">
+          <Label className="text-2xl font-black self-start">Lets get descriptive</Label>
           <Textarea
             value={description}
             onChange={(e) => handeDescriptionChange(e.target.value)}
@@ -149,8 +158,8 @@ const SongPanel = () => {
             <div className="flex items-center gap-x-2">
               <Label>Instrumental?</Label>
               <Switch
-                checked={Instrumental}
-                onCheckedChange={(e) => setInstrumental(e)}
+                checked={isInstrumental}
+                onCheckedChange={(e) => setIsInstrumental(e)}
                 className="w-fit cursor-pointer justify-self-end bg-amber-600"
               />
             </div>
@@ -158,12 +167,11 @@ const SongPanel = () => {
 
           <div className="container w-full space-y-1 space-x-1">
             {categories.map((cat, index) => (
-              <Button
+              <Badge
                 onClick={() => handleTagClick(cat)}
-                size={"xs"}
+                variant={!tags.includes(cat) ? 'secondary' : 'default'}
                 key={index}
-                variant={tags.includes(cat) ? "default" : "outline"}
-                className="text-xs"
+                className={`text-xs cursor-pointer text-black ${!tags.includes(cat) ? 'hover:bg-muted bg-white' : 'hover:bg-gray-500 text-white'}  shadow-2xs transition-all ease-in 3s`}
               >
                 {tags.includes(cat) ? (
                   <Minus size="small" />
@@ -171,7 +179,7 @@ const SongPanel = () => {
                   <Plus size={"small"} />
                 )}
                 {cat}
-              </Button>
+              </Badge>
             ))}
           </div>
           <div className="flex w-full justify-between">
@@ -201,6 +209,15 @@ const SongPanel = () => {
             className="resize-none"
           />
         </TabsContent>
+
+        {/* submit */}
+        <div className="w-full self-center flex justify-center my-6 mx-auto">
+         <Button onClick={(e) => handleSubmitSong(e)} disabled={isLoading} className="flex-1 max-w-sm self-center flex justify-center items-center gap-x-2 bg-gradient-to-r from-orange-500 to-pink-400 hover:from-pink-500 hover:to-orange-400 font-bold text-lg uppercase transition-colors 1s">
+            {isLoading ? <Loader className="animate-spin"/> : <Music/>}
+            <p><span>{isLoading ? 'Loading' : 'create'} </span></p>
+         </Button>
+
+        </div>
       </Tabs>
     </div>
   );
