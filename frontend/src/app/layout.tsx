@@ -16,6 +16,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { db } from "@/server/db";
+import { Toaster } from "sonner";
 
 const atma = Atma({
   subsets: ["latin"],
@@ -64,6 +65,7 @@ export default async function RootLayout({
               <main className="flex-1 overflow-y-auto">{children}</main>
             </SidebarInset>
           </SidebarProvider>
+          <Toaster/>
         </Providers>
       </body>
     </html>

@@ -1,6 +1,5 @@
 export interface GenerationParams {
   title: string | null;
-  userId: string;
   seed: number | null;
   fullPrompt: string | null;
   describedPrompt: string;
