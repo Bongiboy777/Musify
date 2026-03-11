@@ -1,12 +1,12 @@
 export interface GenerationParams {
-  title: string | null;
-  seed: number | null;
+  title: string;
+  seed: number;
   fullPrompt: string | null;
   describedPrompt: string;
   fullLyrics: string | null;
   describedLyrics: string | null;
-  instrumental: boolean | null;
-  guidanceScale: number | null;
-  inferStep: number | null;
-  audioDuration: number | null;
+  instrumental: boolean;
+  guidanceScale: number;
+  inferStep: number ;
+  audioDuration: number;
 }

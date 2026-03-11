@@ -8,7 +8,7 @@ import { Button } from "./ui/button";
 import { Loader, Minus, Music, Plus } from "lucide-react";
 import { Switch } from "./ui/switch";
 import { Badge } from "./ui/badge";
-import { Separator } from "radix-ui";
+import { Separator } from '@/components/ui/separator'
 import {
     Dialog,
     DialogContent,
@@ -17,10 +17,14 @@ import {
     DialogDescription,
 } from "./ui/dialog";
 import { Input } from "./ui/input";
+import JobsBoard from "./jobsboards";
 import { toast } from "sonner";
 import { generate } from "@/lib/actions/generation";
 import type { GenerationParams } from "@/lib/types/generation-params";
 import { time } from "console";
+import { Slider } from "./ui/slider";
+import { ScrollArea } from "./ui/scroll-area";
+import { JobStatus } from "generated/prisma";
 
 const SongPanel = () => {
     // Shared components
@@ -33,6 +37,8 @@ const SongPanel = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [addingTag, setAddingTag] = useState<boolean>(false)
     const [newTag, setNewTag] = useState<string>('')
+    const [title, setTitle] = useState<string>('')
+    const [songLength, setSongLength] = useState<number[]>([60, 150])
     const [categories, setCategories] = useState([
         "Retro",
         "80s Funk",
@@ -44,8 +50,9 @@ const SongPanel = () => {
         "Smooth",
         "Cinematic",
     ].map(c => c.toLocaleLowerCase()))
+    const [jobs, setJobs] = useState<string[]>([])
 
-    setInterval(() => { setIsLoading(false) }, 5000)
+
 
 
 
@@ -103,7 +110,8 @@ const SongPanel = () => {
         try {
             setIsLoading(true)
             const params = {
-                audioDuration: 200,
+                title: title ? title : (mode === "simple" ? description : tags.join(",")),
+                audioDuration: (Math.random() * (songLength[1]! - songLength[0]!)) + songLength[0]!,
                 describedLyrics: customModeFullyrics ? null : lyrics,
                 fullLyrics: customModeFullyrics ? lyrics : null,
                 describedPrompt: tags.join(','),
@@ -111,7 +119,7 @@ const SongPanel = () => {
                 
             }
             const jobIdA = await generate({...params,
-                title: '',
+        
                 inferStep: Math.random() * 8,
                 seed: Math.random() * 4353252,
                 guidanceScale: Math.random(),
@@ -119,12 +127,14 @@ const SongPanel = () => {
              })
 
              const jobIdB = await generate({...params,
-                title: '',
                 inferStep: Math.random() * 8,
                 seed: Math.random() * 4353252,
                 guidanceScale: Math.random(),
                 instrumental: isInstrumental,
              })
+             console.log(jobIdA)
+             console.log(jobIdB)
+             setJobs(jobs.concat([jobIdA, jobIdB]))
 
              return [jobIdA, jobIdB]
         }
@@ -159,7 +169,11 @@ const SongPanel = () => {
                         Custom
                     </TabsTrigger>
                 </TabsList>
-
+                <Input className="max-w-md capitalize my-2 px-1" placeholder="Enter a title here." value={title} onChange={(e) =>  setTitle(e.target.value)}/>
+               <div className="flex flex-col items-start w-full gap-y-2">
+                 <Slider  min={60} max={180} aria-label="song length (seconds)" value={songLength} onValueChange={setSongLength}/>
+                <p className="italic font-light text-xs">Between {songLength[0]} and {songLength[1]} seconds </p>
+               </div>
                 {/* simple mode tab */}
 
                 <TabsContent value="simple" className="mt-4 flex w-full flex-col gap-y-4 items-center">
@@ -314,6 +328,19 @@ const SongPanel = () => {
 
                 </div>
             </Tabs>
+
+        <Separator/>
+ {jobs &&  jobs.length > 0 ?
+        <ScrollArea className="h-72 w-full rounded-md border">
+     <JobsBoard jobs={jobs} />
+
+    </ScrollArea>:
+    <></>
+ } 
+
+    <div className="w-full flex flex-col overflow-y">
+        
+    </div>
         </div>
     );
 };

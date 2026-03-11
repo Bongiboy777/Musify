@@ -24,13 +24,11 @@ export async function generate(songParams: GenerationParams){
             title: songParams.title || null,
             userId: userId,
             describedPrompt: songParams.describedPrompt,
-            describedLyrics: songParams.describedLyrics || null,
-            audioDuration:
-              songParams.audioDuration || Math.random() * (210 - 30) + 30, // Random duration between 30 and 210 seconds
-            inferStep: songParams.inferStep || Math.random() * (0.7 - 0.2) + 0.2,
-            guidanceScale:
-              songParams.guidanceScale || Math.random() * (0.7 - 0.2) + 0.2,
-            instrumental: songParams.instrumental || false,
+            describedLyrics: songParams.describedLyrics,
+            audioDuration:songParams.audioDuration,
+            inferStep: songParams.inferStep,
+            guidanceScale: songParams.guidanceScale,
+            instrumental: songParams.instrumental,
           },
         });
     

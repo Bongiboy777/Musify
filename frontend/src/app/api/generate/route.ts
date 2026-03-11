@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
 import { inngest } from "@/inngest/client"; // Import our client
-import type { GenerationParams } from "@/lib/types/generation-params";
 import { db } from "@/server/db";
-import { success } from "zod";
 export const dynamic = "force-dynamic";
-import { getRuns } from "@/lib/utils";
-import { get } from "http";
 
 // Create a simple async Next.js API route handler
 export async function POST(request: Request) {
