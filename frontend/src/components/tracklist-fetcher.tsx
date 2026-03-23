@@ -4,7 +4,10 @@ import { db } from '@/server/db'
 import { getSession } from 'better-auth/api'
 import { headers } from 'next/headers'
 import React from 'react'
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card'
+import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card'
+import { getPresignedUrl } from '@/lib/actions/awsclient'
+import { Button } from './ui/button'
+import { Badge } from 'lucide-react'
 
 const TrackListFetcher = async () => {
   await new Promise(resolve => setTimeout(resolve, 5000))
@@ -12,6 +15,7 @@ const TrackListFetcher = async () => {
     headers: await headers()
   })
 
+  
 
   const songs = db.song.findMany({
     where:{
@@ -20,20 +24,31 @@ const TrackListFetcher = async () => {
   })
   
   return (
-    <div className='grid grid-cols-4 gap-4 '>{(await songs).map(song => (<Card className='overflow-x-hidden max-h-[100px] px-2 cursor-pointer hover:scale-105 transition-all 1s ease-in opacity-60 bg-slate-400 hover:bg-slate-600 hover:opacity-100'>
-      <CardHeader className='p-0 m-0'>
-        <CardTitle className='font-bold capitalize flex justify-between'>
-          {song.title ? song.title : 'No title'}
-          <p className='italic text-xs font-light'>{`${song.audioDuration.toFixed(2)}`} s</p>
-        </CardTitle>
+    <div className='w-full bg-amber-400 grid grid-cols-4 gap-4'>
+      
+      {(await songs).map( async song => (
+         <Card className="relative w-full pt-0 flex flex-col justify-start">
+      <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
+      <img
+        src={song.image_s3_loc ? await getPresignedUrl(song.image_s3_loc) : 'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg'}
+        alt="Event cover"
+        className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
+      />
+      <CardHeader>
+        <CardAction>
+          {song.instrumental && <Badge variant="secondary">Featured</Badge>}
+        </CardAction>
+        <CardTitle>{song.title}</CardTitle>
+        <CardDescription className='text-sm'>
+          {song.describedPrompt}
+        </CardDescription>
       </CardHeader>
-      <CardDescription>
-      {song.describedPrompt}
-      </CardDescription>
       <CardFooter>
-        {song.instrumental}
+        <Button className="" size={'sm'}>Listen</Button>
       </CardFooter>
-    </Card>)
+    </Card>
+    
+  )
 
     )}</div>
   )

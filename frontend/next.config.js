@@ -5,6 +5,15 @@
 import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+    images: {
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "amzn-s3-musify.s3.eu-north-1.amazonaws.com",
+            },
+        ],
+    },
+};
 
 export default config;

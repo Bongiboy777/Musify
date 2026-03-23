@@ -8,7 +8,11 @@ const CreatePage = () => {
     <div className="bg-muted/30 flex min-h-screen w-full">
         <SongPanel />
         <div className="w-full h-full flex justify-center items-center px-8 py-4">
-        <Suspense fallback={<Loader2 className="self-center justify-self-center"/>}>
+        <Suspense fallback={
+          <div className="w-full h-full justify-center items-center">
+          <Loader2 className="self-center justify-self-center"/>
+          </div>
+          }>
         
                   <TrackListFetcher/>
 

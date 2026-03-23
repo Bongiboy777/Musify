@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1012.0",
-    "@aws-sdk/s3-request-presigner": "^3.1012.0",
+    "@aws-sdk/s3-request-presigner": "^3.1014.0",
     "@daveyplate/better-auth-ui": "^3.3.15",
     "@prisma/client": "^6.6.0",
     "@radix-ui/react-slot": "^1.2.4",

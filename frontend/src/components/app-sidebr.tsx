@@ -34,7 +34,7 @@ export async function AppSidebar() {
     : null;
 
   return (
-    <Sidebar>
+    <Sidebar className="overflow-x-hidden">
       <SidebarHeader
         title="Musify"
         className="flex items-center justify-start text-2xl font-black uppercase"
@@ -42,14 +42,14 @@ export async function AppSidebar() {
         <h1>Musify</h1>
         <Separator orientation="horizontal" className="my-4" />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="overflow-hidden">
         <SidebarGroup>
           <NavLinks />
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuItem className="mx-auto flex w-full flex-row items-center gap-4 px-4">
+          <SidebarMenuItem className="flex w-full flex-row items-center justify-center py-2">
             {credits && <Credits credits={credits.credits} />}
             <UpgradeButton />
           </SidebarMenuItem>
@@ -60,7 +60,7 @@ export async function AppSidebar() {
               className="flex-1"
               variant={"outline"}
               additionalLinks={[
-                { label: "User portal", icon: <User />, href: "/profile" },
+                // { label: "User portal", icon: <User />, href: "/profile" },
               ]}
             />
           </SidebarMenuItem>
