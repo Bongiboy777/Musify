@@ -12,6 +12,14 @@ const config = {
                 protocol: "https",
                 hostname: "amzn-s3-musify.s3.eu-north-1.amazonaws.com",
             },
+            {
+                protocol:'https',
+                hostname:'commons.wikimedia.org'
+            },
+            {
+                protocol:'https',
+                hostname:'upload.wikimedia.org'
+            }
         ],
     },
 };

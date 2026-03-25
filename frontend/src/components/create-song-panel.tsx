@@ -25,6 +25,7 @@ import { time } from "console";
 import { Slider } from "./ui/slider";
 import { ScrollArea } from "./ui/scroll-area";
 import { JobStatus } from "generated/prisma";
+import TrackList from "./tracklist";
 
 const SongPanel = () => {
     // Shared components
@@ -153,7 +154,7 @@ const SongPanel = () => {
     }
 
     return (
-        <div className="flex border-r bg-muted h-svh w-fit px-8 max-w-md flex-col items-center gap-y-4 rounded-lg p-8">
+        <div className="flex flex-1 sm:min-w-lg border-r bg-muted h-svh px-8 max-w-md flex-col items-center gap-y-4 rounded-r-lg p-8">
             <Tabs
                 defaultValue="simple"
                 value={mode}
@@ -329,18 +330,14 @@ const SongPanel = () => {
                 </div>
             </Tabs>
 
-        <Separator/>
- {jobs &&  jobs.length > 0 ?
-        <ScrollArea className="h-72 w-full rounded-md border">
+       <Separator className="h-full w-1"/>
+       {/* {jobs &&  jobs.length > 0 ?
+        <ScrollArea className="max-h-32 w-full rounded-md border">
      <JobsBoard jobs={jobs} />
 
     </ScrollArea>:
     <></>
- } 
-
-    <div className="w-full flex flex-col overflow-y">
-        
-    </div>
+ }  */}
         </div>
     );
 };
