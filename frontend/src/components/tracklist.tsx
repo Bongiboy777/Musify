@@ -1,5 +1,5 @@
 "use client";
-import { RefreshCcw, Scroll, Search } from "lucide-react";
+import { Loader2, RefreshCcw, Scroll, Search } from "lucide-react";
 import React, { useState } from "react";
 import { Input } from "./ui/input";
 import type { Song } from "generated/prisma";
@@ -9,9 +9,17 @@ import SongCard from "./song-card";
 import type track from "@/lib/types/track";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
+import { handler } from "next/dist/build/templates/app-page";
 
 const TrackList = ({ trackList }: { trackList: track[] }) => {
   const [query, setQuery] = useState<string>("");
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
+  const handleRefresh = async (e: any) => {
+    setIsRefreshing(true)
+    await new Promise(resolve => setTimeout( resolve, 2000))
+    setIsRefreshing(false)
+
+  }
   // const jobs = trackList.map(t => t.jobId!)
   const filteredItems = trackList.filter(track => track.title?.toLowerCase().includes(query.toLocaleLowerCase().trim()))
   return (
@@ -36,8 +44,11 @@ const TrackList = ({ trackList }: { trackList: track[] }) => {
 
        
       </div>
-         <Button variant={"secondary"}>
-          <RefreshCcw/>
+         <Button variant={"outline"} disabled={isRefreshing} onClick={handleRefresh}>
+          {
+           isRefreshing ? <Loader2 className='animate-spin'/> : <RefreshCcw/>
+
+          }
           <p>Refresh</p>
         </Button>
       </div>

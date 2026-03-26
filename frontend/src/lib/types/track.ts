@@ -1,3 +1,5 @@
+import type { JobStatus } from "generated/prisma";
+
 export default interface track {
 
     id: string;
@@ -20,4 +22,5 @@ export default interface track {
     jobId: string | null;
     thumbnailUrl: string | null
     playUrl: string | null
+    jobStatus: JobStatus | null
 }

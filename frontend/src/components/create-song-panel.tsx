@@ -154,7 +154,7 @@ const SongPanel = () => {
     }
 
     return (
-        <div className="flex flex-1 sm:min-w-lg border-r bg-muted h-svh px-8 max-w-md flex-col items-center gap-y-4 rounded-r-lg p-8">
+        <div className="flex flex-1 sm:min-w-lg  border-r bg-muted h-svh px-8 max-w-md flex-col items-center gap-y-4 rounded-r-lg p-8">
             <Tabs
                 defaultValue="simple"
                 value={mode}
@@ -320,7 +320,12 @@ const SongPanel = () => {
                     />
                 </TabsContent>
 
-                {/* submit */}
+             
+            </Tabs>
+
+       <Separator className="h-full w-1"/>
+
+          {/* submit */}
                 <div className="w-full self-center flex justify-center my-6 mx-auto">
                     <Button onClick={(e) => handleSubmitSong(e)} disabled={isLoading} className="flex-1 max-w-sm self-center flex justify-center items-center gap-x-2 bg-gradient-to-r from-orange-500 to-pink-400 hover:from-pink-500 hover:to-orange-400 font-bold text-lg uppercase transition-colors 1s">
                         {isLoading ? <Loader className="animate-spin" /> : <Music />}
@@ -328,9 +333,6 @@ const SongPanel = () => {
                     </Button>
 
                 </div>
-            </Tabs>
-
-       <Separator className="h-full w-1"/>
        {/* {jobs &&  jobs.length > 0 ?
         <ScrollArea className="max-h-32 w-full rounded-md border">
      <JobsBoard jobs={jobs} />

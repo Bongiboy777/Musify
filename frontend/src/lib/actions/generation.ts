@@ -6,6 +6,7 @@ import { auth } from "../auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { GenerationParams } from "../types/generation-params";
+import { revalidatePath } from "next/cache";
 
 export async function generate(songParams: GenerationParams){
     const session = await auth.api.getSession({
@@ -73,6 +74,7 @@ export async function generate(songParams: GenerationParams){
         console.log(
           `Song created with ID: ${song.id}, associated Job ID: ${songStatus?.jobId}`,
         );
+        revalidatePath('/create')
     
         return job.id
       } catch (error) {

@@ -12,11 +12,10 @@ import {
 import { AppSidebar } from "@/components/app-sidebr";
 import { Separator } from "@/components/ui/separator";
 import NavBreadcrumbs from "@/components/nav-breadcrumbs";
-import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { db } from "@/server/db";
 import { Toaster } from "sonner";
+import { SessionKeepAlive } from "@/components/session-keep-alive";
 
 const atma = Atma({
   subsets: ["latin"],
@@ -39,13 +38,6 @@ export default async function RootLayout({
   
   
   
-    setInterval(async () => {
-      await db.user.findUniqueOrThrow({
-        where: {
-          id: session!.user.id,
-        },
-      });
-    }, 240000);
   return (
     <html lang="en" className={`${atma.variable}`}>
       <body>
@@ -53,11 +45,11 @@ export default async function RootLayout({
           <SidebarProvider>
             <AppSidebar />
             <SidebarInset className="flex h-screen flex-col">
-              <header className="sticky-top bg-background z-10 flex items-center justify-start gap-2 border-b py-2">
+              <header className="sticky top-0 bg-background z-10 flex items-center justify-start gap-2 border-b py-2">
                 <SidebarTrigger />
                 <Separator
                   orientation="vertical"
-                  className="dat-[orientation=vertical]"
+                  className="h-6"
                 />
                 <NavBreadcrumbs />
               </header>
@@ -66,6 +58,7 @@ export default async function RootLayout({
             </SidebarInset>
           </SidebarProvider>
           <Toaster/>
+          <SessionKeepAlive />
         </Providers>
       </body>
     </html>

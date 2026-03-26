@@ -122,17 +122,12 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50 box-content overflow-hidden max-h-screen max-w-screen p-0 m-0 transition-all;
+    @apply border-border outline-ring/50 p-0 m-0;
+    box-sizing: border-box;
   }
   body {
     @apply bg-background text-foreground;
   }
-}
-
-* {
-  box-sizing: content-box;
-  overflow-x: hidden;
-  
 }
 
 button {

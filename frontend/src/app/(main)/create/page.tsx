@@ -6,7 +6,6 @@ import { Hand, Loader2 } from "lucide-react";
 import React, { Suspense } from "react";
 
 const CreatePage = async () => {
-const trackList = TrackListFetcher()
   return (
     <div className="flex flex-1 h-fit border-b-lg w-full flex-col md:flex-row">
       <SongPanel />
@@ -18,7 +17,7 @@ const trackList = TrackListFetcher()
         <Loader2 className="self-center justify-self-center animate-spin"/>
         </div>
         }>
-      <TrackList trackList={await trackList}/>
+      <TrackListFetcher />
 
       </Suspense>
       </div>

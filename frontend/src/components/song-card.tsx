@@ -7,7 +7,8 @@ import { getPresignedUrl } from '@/lib/actions/awsclient'
 import Image from 'next/image'
 import type track from '@/lib/types/track'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
-import { Music, Play } from 'lucide-react'
+import { Loader2, Music, Play, Verified } from 'lucide-react'
+import { jobRouter } from '@/server/api/routers/job'
 
 
 
@@ -17,8 +18,8 @@ const SongCard = ({song}: {song: track}) => {
      <Dialog>
       
       {/* 1. Clickable Item/Button */}
-         <div className="flex items-center gap-2 transition-all 0.8s cursor-pointer">
-               <div className="w-fit h-fit aspect-square relative flex items-center justify-center">
+         <div className="flex items-center gap-2 min-w-0 w-full transition-all cursor-pointer">
+               <div className="w-16 h-16 shrink-0 aspect-square relative flex items-center justify-center">
                       <Play size={'32px'} className='items-center text-center opacity-100 absolute self-center align-middle'/>
 
                 <Image
@@ -40,10 +41,17 @@ const SongCard = ({song}: {song: track}) => {
                </DialogHeader>
       <DialogTrigger asChild>
         
-        <div className="flex items-center w-full">
+        <div className="flex items-center min-w-0 flex-1">
    
-      <div className="h-full flex-1 ">
-        <p>{song.title}</p>
+      <div className="h-full min-w-0 flex-1">
+        <Badge className={`${song.jobStatus === "COMPLETED" ? 'bg-green-700' : song.jobStatus === "FAILED" ? 'bg-red-700' : 'bg-amber-500'} flex items-center gap-x-2 `} color={song.jobStatus === "COMPLETED" ? 'green' : 'red'}>
+        {song.jobStatus != "COMPLETED" ? <Loader2 className='animate-spin'/> : <Verified/> }
+        <div className="font-bold text-xs">
+          {song.jobStatus}
+        </div>
+
+        </Badge>
+        <p className="truncate max-w-[280px] text-sm font-medium">{song.title}</p>
 
 
       </div>
@@ -54,7 +62,7 @@ const SongCard = ({song}: {song: track}) => {
          </div>
       
       {/* 2. The Overlay Card */}
-      <DialogContent className="sm:max-w-[425px] border-none shadow-lg flex">
+      <DialogContent className="sm:max-w-[425px] border-none shadow-lg flex rounded-lg">
     
         <Image
    
@@ -63,7 +71,7 @@ const SongCard = ({song}: {song: track}) => {
         objectFit={'cover'}
         fill
       />
-    <Card className="relative w-full py-8 px-4 flex flex-col justify-start bg-white opacity-95 backdrop-blur-3xl">
+    <Card className="relative rounded-lg w-full py-8 px-4 flex flex-col justify-start bg-white opacity-95 backdrop-blur-3xl">
      
      
      <CardHeader>

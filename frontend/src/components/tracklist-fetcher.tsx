@@ -9,9 +9,9 @@ import { getPresignedUrl } from '@/lib/actions/awsclient'
 import { Button } from './ui/button'
 import { Badge } from 'lucide-react'
 import SongCard from './song-card'
+import TrackList from './tracklist'
 
 const TrackListFetcher = async () => {
-  await new Promise(resolve => setTimeout(resolve, 5000))
   const session = await auth.api.getSession({
     headers: await headers()
   })
@@ -19,11 +19,19 @@ const TrackListFetcher = async () => {
   const songs = db.song.findMany({
     where:{
       userId: session?.user.id
-    }
+    },
+
   })
+
+  
 
   const songsWithThumbNails = await Promise.all((await songs).map(async song => {
     let thumbnailUrl: string
+    const job = await db.job.findUnique({
+      where:{
+        id: song.jobId!
+      }
+    })
     if (song.image_s3_loc){
       thumbnailUrl = await getPresignedUrl(song.image_s3_loc)
     }
@@ -31,6 +39,7 @@ const TrackListFetcher = async () => {
       thumbnailUrl = ""
     }
    return {
+    jobStatus: job?.status!,
      thumbnailUrl,
      playUrl: '',
     ...song
@@ -39,8 +48,16 @@ const TrackListFetcher = async () => {
   }))
 
   return songsWithThumbNails
-  
 
 }
 
-export default TrackListFetcher
+const Tracks = async () => {
+  return (
+          <TrackList trackList={await TrackListFetcher()}/>
+
+  )
+}
+
+export default Tracks
+
+export {TrackListFetcher}

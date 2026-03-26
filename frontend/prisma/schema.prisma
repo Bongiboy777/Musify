@@ -40,6 +40,7 @@ model Song {
   likes           Like[]
   user            User       @relation(fields: [userId], references: [id])
   categories      Category[] @relation("CategoryToSong")
+  
 
   @@map("song")
 }
@@ -52,6 +53,7 @@ model Job {
   status    JobStatus @default(QUEUED)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  
 
   @@map("job")
 }
