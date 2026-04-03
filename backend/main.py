@@ -471,20 +471,6 @@ def SendAndProcessRequest(endpoint_url, image_model_name, llm_model_name):
 
         if response.ok:
             pass
-            # out_fname = f"{uuid.uuid4()}.wav"
-            # # os.makedirs('/model_outputs/', exist_ok=True)
-            # print("Decoding audio string and writing to %s", out_fname)
-            # print(f"len audio str: {len(music_response.audio_str)}")
-            # res_bytes = base64.b64decode(music_response.audio_str)
-            # print(f"returned categories: {music_response.categories}")
-            # print(f"returned lyrics: {music_response.lyrics}")
-            # print(os.path.abspath(out_fname))
-            # with open(out_fname, "wb") as stream:
-            #     stream.write(res_bytes)
-
-            # size = os.path.getsize(out_fname)
-
-            # print("Wrote audio file %s (%d bytes)", out_fname, size)
         else:
             logger.error(
                 "Endpoint returned non-OK status: %s. Response text: %s",

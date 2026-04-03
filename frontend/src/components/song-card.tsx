@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import {Card, CardHeader, CardAction, CardTitle, CardDescription, CardFooter} from '@/components/ui/card'
 import { Button, } from './ui/button'
@@ -9,10 +10,30 @@ import type track from '@/lib/types/track'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
 import { Loader2, Music, Play, Verified } from 'lucide-react'
 import { jobRouter } from '@/server/api/routers/job'
+import { db } from '@/server/db'
+import { toast } from 'sonner'
 
 
 
 const SongCard = ({song}: {song: track}) => {
+  async function handlePlayBack(id: string): Promise<void> {
+    const s3Url = await db.song.findUnique({
+      where:{
+        id:song.id
+      },
+      select:{
+        id:true,
+        s3_loc:true
+      }
+    })
+
+    if (!s3Url || !s3Url.s3_loc){
+      toast('Error: No playback url')
+      throw new Error('no s3 location')
+    }
+    const playbackUrl = await getPresignedUrl(s3Url?.s3_loc!)
+  }
+
   return (
     
      <Dialog>

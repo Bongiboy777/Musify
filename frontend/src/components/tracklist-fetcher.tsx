@@ -11,6 +11,8 @@ import { Badge } from 'lucide-react'
 import SongCard from './song-card'
 import TrackList from './tracklist'
 
+// these are server actions, can only be used in server component, i.e. calling db, getting session.
+//this infor can then be passed to the client component, e.g. user id, song url etc.
 const TrackListFetcher = async () => {
   const session = await auth.api.getSession({
     headers: await headers()
@@ -59,5 +61,3 @@ const Tracks = async () => {
 }
 
 export default Tracks
-
-export {TrackListFetcher}
