@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import {Card, CardHeader, CardAction, CardTitle, CardDescription, CardFooter} from '@/components/ui/card'
 import { Button, } from './ui/button'
 import { Badge } from './ui/badge'
@@ -8,30 +8,34 @@ import { getPresignedUrl } from '@/lib/actions/awsclient'
 import Image from 'next/image'
 import type track from '@/lib/types/track'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
-import { Loader2, Music, Play, Verified } from 'lucide-react'
+import { BookOpenTextIcon, Download, Loader2, MoreHorizontal, Music, Pencil, Play, Verified } from 'lucide-react'
 import { jobRouter } from '@/server/api/routers/job'
 import { db } from '@/server/db'
 import { toast } from 'sonner'
+import { getPlaybackUrl } from '@/lib/actions/song'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from './ui/dropdown-menu'
+import { Input } from './ui/input'
+import RenameDialog from './rename-dialog'
+import { usePlayback } from '@/lib/stores/song'
 
 
 
-const SongCard = ({song}: {song: track}) => {
+const SongCard = ({song, onSelect}: {song: track, onSelect: (id: string) => void}) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const play = usePlayback((state) => state.title)
+  
+  
   async function handlePlayBack(id: string): Promise<void> {
-    const s3Url = await db.song.findUnique({
-      where:{
-        id:song.id
-      },
-      select:{
-        id:true,
-        s3_loc:true
-      }
-    })
+    setIsLoading(true)
+    await onSelect(id)
+    play
+    
+    setIsLoading(false)
+  }
 
-    if (!s3Url || !s3Url.s3_loc){
-      toast('Error: No playback url')
-      throw new Error('no s3 location')
-    }
-    const playbackUrl = await getPresignedUrl(s3Url?.s3_loc!)
+  async function handleDownload(){
+    const playUrl = await getPlaybackUrl(song.id)
+    window.open(playUrl, '_blank')
   }
 
   return (
@@ -41,7 +45,7 @@ const SongCard = ({song}: {song: track}) => {
       {/* 1. Clickable Item/Button */}
          <div className="flex items-center gap-2 min-w-0 w-full transition-all cursor-pointer">
                <div className="w-16 h-16 shrink-0 aspect-square relative flex items-center justify-center">
-                      <Play size={'32px'} className='items-center text-center opacity-100 absolute self-center align-middle'/>
+                      {isLoading ? (<Loader2 size={'32px'} className='items-center text-center opacity-100 absolute self-center align-middle animate-spin'/>) : <Play size={'32px'} className='items-center text-center opacity-100 absolute self-center align-middle'/>}
 
                 <Image
         width={256}
@@ -49,6 +53,7 @@ const SongCard = ({song}: {song: track}) => {
         src={song.thumbnailUrl ? song.thumbnailUrl : 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Image-not-found.png?_=20210521171500'}
         alt="Event cover"
         className="w-16 h-16 aspect-square rounded-md hover:bg-white hover:opacity-40 z-10  hover:scale-[101%] translate-0 hover:translate-0"
+        onClick={() => handlePlayBack(song.id)}
       />
                </div>
 
@@ -60,11 +65,13 @@ const SongCard = ({song}: {song: track}) => {
                   
                 </DialogDescription>
                </DialogHeader>
-      <DialogTrigger asChild>
+      
         
         <div className="flex items-center min-w-0 flex-1">
    
       <div className="h-full min-w-0 flex-1">
+                <p className="truncate max-w-[280px] text-sm font-medium">{song.title}</p>
+
         <Badge className={`${song.jobStatus === "COMPLETED" ? 'bg-green-700' : song.jobStatus === "FAILED" ? 'bg-red-700' : 'bg-amber-500'} flex items-center gap-x-2 `} color={song.jobStatus === "COMPLETED" ? 'green' : 'red'}>
         {song.jobStatus != "COMPLETED" ? <Loader2 className='animate-spin'/> : <Verified/> }
         <div className="font-bold text-xs">
@@ -72,21 +79,54 @@ const SongCard = ({song}: {song: track}) => {
         </div>
 
         </Badge>
-        <p className="truncate max-w-[280px] text-sm font-medium">{song.title}</p>
 
+      </div>
+      <div className="flex gap-2 flex-end self-start items-center justify-center">
+        
+         <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <MoreHorizontal/>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-40" align="start">
+  
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+          <RenameDialog song={song}/>
+         
+          
+        </DropdownMenuItem>
+    
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className='flex items-center gap-2' onClick={async (e) => {
+          e.stopPropagation()
+          await handleDownload()
+        }}>
+          <Download/> Download
+        </DropdownMenuItem>
+  
+      </DropdownMenuContent>
+    </DropdownMenu>
+     <DialogTrigger asChild>
+      
+    <Button variant={'outline'}>
+      <BookOpenTextIcon>
 
+      </BookOpenTextIcon>
+      </Button>
+      </DialogTrigger>
+    <Button variant={'outline'}>Publish</Button>
+        
       </div>
           
           
         </div>
-      </DialogTrigger>
+       
          </div>
       
       {/* 2. The Overlay Card */}
       <DialogContent className="sm:max-w-[425px] border-none shadow-lg flex rounded-lg">
     
         <Image
-   
+        className='rounded-lg'
         src={song.thumbnailUrl ? song.thumbnailUrl : 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Image-not-found.png?_=20210521171500'}
         alt="Event cover"
         objectFit={'cover'}

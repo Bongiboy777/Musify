@@ -1,4 +1,3 @@
-'use server'
 import { auth } from '@/lib/auth'
 import { db } from '@/server/db'
 import { getSession } from 'better-auth/api'
