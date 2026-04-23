@@ -8,7 +8,7 @@ import { getPresignedUrl } from '@/lib/actions/awsclient'
 import Image from 'next/image'
 import type track from '@/lib/types/track'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
-import { BookOpenTextIcon, Download, Loader2, MoreHorizontal, Music, Pencil, Play, Verified } from 'lucide-react'
+import { BookOpenTextIcon, Cross, Download, Loader2, MoreHorizontal, Music, Pencil, Play, Verified, X } from 'lucide-react'
 import { jobRouter } from '@/server/api/routers/job'
 import { db } from '@/server/db'
 import { toast } from 'sonner'
@@ -22,13 +22,13 @@ import { usePlayback } from '@/lib/stores/song'
 
 const SongCard = ({song, onSelect}: {song: track, onSelect: (id: string) => void}) => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const play = usePlayback((state) => state.title)
+  const setTrack = usePlayback((state) => state.setTrack)
   
   
   async function handlePlayBack(id: string): Promise<void> {
     setIsLoading(true)
     await onSelect(id)
-    play
+    
     
     setIsLoading(false)
   }
@@ -73,7 +73,7 @@ const SongCard = ({song, onSelect}: {song: track, onSelect: (id: string) => void
                 <p className="truncate max-w-[280px] text-sm font-medium">{song.title}</p>
 
         <Badge className={`${song.jobStatus === "COMPLETED" ? 'bg-green-700' : song.jobStatus === "FAILED" ? 'bg-red-700' : 'bg-amber-500'} flex items-center gap-x-2 `} color={song.jobStatus === "COMPLETED" ? 'green' : 'red'}>
-        {song.jobStatus != "COMPLETED" ? <Loader2 className='animate-spin'/> : <Verified/> }
+        {song.jobStatus == "COMPLETED" ? <Verified/> : song.jobStatus == "FAILED" ? <X/>:  <Loader2 className='animate-spin'/> }
         <div className="font-bold text-xs">
           {song.jobStatus}
         </div>

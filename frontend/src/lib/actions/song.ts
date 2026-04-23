@@ -4,18 +4,38 @@ import { db } from "@/server/db"
 import { toast } from "sonner"
 import { getPresignedUrl } from "./awsclient"
 import { revalidatePath } from "next/cache"
+interface TrackInfo{
+  title: string;
+  thumbnail: string;
+  playbackUrl: string;
+  createdBy: string;
+}
 
-
-export async function getPlaybackUrl(id: string) : Promise<any>{
-const s3Url = await db.song.findUnique({
+export async function getPlaybackUrl(id: string) : Promise<TrackInfo>{
+const song = await db.song.findUnique({
       where:{
         id:id
       },
-      select:{
-        id:true,
-        s3_loc:true
+      include:{
+        user:{
+            
+        }
+        
       }
       
+    })
+
+    const createdBy = await db.song.findUnique({
+        where:{
+            id:id
+        },
+        include:{
+            user:{
+                select:{
+                    name:true
+                }
+            }
+        }
     })
 
     db.song.update({
@@ -29,13 +49,20 @@ const s3Url = await db.song.findUnique({
         }
     })
 
-    if (!s3Url || !s3Url.s3_loc){
+    if (!song || !song.s3_loc){
       toast('Error: No playback url')
       throw new Error('no s3 location')
     }
-    const playbackUrl = await getPresignedUrl(s3Url?.s3_loc!)
+    const playbackUrl = await getPresignedUrl(song?.s3_loc!)
+    const imgUrl = await getPresignedUrl(song?.image_s3_loc!)
     revalidatePath('/create')
-    return playbackUrl
+    return {
+    title: song.title!,
+    thumbnail: imgUrl,
+    playbackUrl:playbackUrl,
+    createdBy: song?.user.name
+
+    }
 }
 
 

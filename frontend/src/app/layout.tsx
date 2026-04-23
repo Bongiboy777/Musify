@@ -54,7 +54,7 @@ export default async function RootLayout({
                 <NavBreadcrumbs />
               </header>
 
-              <main className="flex-1 overflow-y-auto">{children}</main>
+              <main className="flex-1">{children}</main>
             </SidebarInset>
           </SidebarProvider>
           <Toaster/>

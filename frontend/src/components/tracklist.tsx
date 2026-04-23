@@ -11,11 +11,13 @@ import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { handler } from "next/dist/build/templates/app-page";
 import { getPlaybackUrl } from "@/lib/actions/song";
+import { usePlayback } from "@/lib/stores/song";
 
 const TrackList = ({ trackList }: { trackList: track[] }) => {
   const [query, setQuery] = useState<string>("");
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
   const [playUrl, setPlayUrl] = useState('')
+  const setTrack = usePlayback((set) => set.setTrack)
   const handleRefresh = async (e: any) => {
     setIsRefreshing(true)
     await new Promise(resolve => setTimeout( resolve, 2000))
@@ -24,8 +26,9 @@ const TrackList = ({ trackList }: { trackList: track[] }) => {
   }
 
   const handleSelect = async (id: string) => {
-    const playbackUrl = await getPlaybackUrl(id)
-    setPlayUrl(playbackUrl)
+    const trackInfo = await getPlaybackUrl(id)
+
+    setTrack(trackInfo)
 
   }
   // const jobs = trackList.map(t => t.jobId!)

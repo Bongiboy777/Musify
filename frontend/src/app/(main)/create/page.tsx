@@ -1,5 +1,5 @@
 import SongPanel from "@/components/create-song-panel";
-import SongBar from "@/components/song-bar";
+import SongBar from "@/components/sound-bar";
 import TrackList from "@/components/tracklist";
 import TrackListFetcher from "@/components/tracklist-fetcher";
 import { Separator } from "@/components/ui/separator";
@@ -8,7 +8,7 @@ import React, { Suspense } from "react";
 
 const CreatePage = async () => {
   return (
-    <div className="flex flex-1 border-b-lg w-full flex-col md:flex-row">
+    <div className="flex max-h-screen flex-1 border-b-lg w-full flex-col md:flex-row">
       <SongPanel />
        
 
@@ -17,8 +17,6 @@ const CreatePage = async () => {
         <Loader2 className="self-center justify-self-center animate-spin"/>
         }>
       <TrackListFetcher />
-                    <SongBar />
-
       </Suspense>
 
       </div>
