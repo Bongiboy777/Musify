@@ -44,8 +44,8 @@ export default async function RootLayout({
         <Providers>
           <SidebarProvider>
             <AppSidebar />
-            <SidebarInset className="flex h-screen flex-col">
-              <header className="sticky top-0 bg-background z-10 flex items-center justify-start gap-2 border-b py-2">
+            <SidebarInset className="flex h-screen flex-col overflow-hidden">
+              <header className="sticky top-0 bg-background z-10 flex items-center justify-start gap-2 border-b py-2 px-2 md:px-4 shrink-0">
                 <SidebarTrigger />
                 <Separator
                   orientation="vertical"
@@ -54,7 +54,7 @@ export default async function RootLayout({
                 <NavBreadcrumbs />
               </header>
 
-              <main className="flex-1">{children}</main>
+              <main className="flex-1 overflow-auto">{children}</main>
             </SidebarInset>
           </SidebarProvider>
           <Toaster/>

@@ -35,7 +35,7 @@ const SongCard = ({song, onSelect}: {song: track, onSelect: (id: string) => void
 
   async function handleDownload(){
     const playUrl = await getPlaybackUrl(song.id)
-    window.open(playUrl, '_blank')
+    window.open(playUrl.playbackUrl, '_blank')
   }
 
   return (
@@ -44,7 +44,7 @@ const SongCard = ({song, onSelect}: {song: track, onSelect: (id: string) => void
       
       {/* 1. Clickable Item/Button */}
          <div className="flex items-center gap-2 min-w-0 w-full transition-all cursor-pointer">
-               <div className="w-16 h-16 shrink-0 aspect-square relative flex items-center justify-center">
+               <div className="w-12 h-12 md:w-16 md:h-16 shrink-0 aspect-square relative flex items-center justify-center">
                       {isLoading ? (<Loader2 size={'32px'} className='items-center text-center opacity-100 absolute self-center align-middle animate-spin'/>) : <Play size={'32px'} className='items-center text-center opacity-100 absolute self-center align-middle'/>}
 
                 <Image
@@ -52,7 +52,7 @@ const SongCard = ({song, onSelect}: {song: track, onSelect: (id: string) => void
         height={256}
         src={song.thumbnailUrl ? song.thumbnailUrl : 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Image-not-found.png?_=20210521171500'}
         alt="Event cover"
-        className="w-16 h-16 aspect-square rounded-md hover:bg-white hover:opacity-40 z-10  hover:scale-[101%] translate-0 hover:translate-0"
+        className="w-12 h-12 md:w-16 md:h-16 aspect-square rounded-md hover:bg-white hover:opacity-40 z-10  hover:scale-[101%] translate-0 hover:translate-0"
         onClick={() => handlePlayBack(song.id)}
       />
                </div>
@@ -70,7 +70,7 @@ const SongCard = ({song, onSelect}: {song: track, onSelect: (id: string) => void
         <div className="flex items-center min-w-0 flex-1">
    
       <div className="h-full min-w-0 flex-1">
-                <p className="truncate max-w-[280px] text-sm font-medium">{song.title}</p>
+                <p className="truncate max-w-[120px] sm:max-w-[200px] md:max-w-[280px] text-sm font-medium">{song.title}</p>
 
         <Badge className={`${song.jobStatus === "COMPLETED" ? 'bg-green-700' : song.jobStatus === "FAILED" ? 'bg-red-700' : 'bg-amber-500'} flex items-center gap-x-2 `} color={song.jobStatus === "COMPLETED" ? 'green' : 'red'}>
         {song.jobStatus == "COMPLETED" ? <Verified/> : song.jobStatus == "FAILED" ? <X/>:  <Loader2 className='animate-spin'/> }
@@ -81,7 +81,7 @@ const SongCard = ({song, onSelect}: {song: track, onSelect: (id: string) => void
         </Badge>
 
       </div>
-      <div className="flex gap-2 flex-end self-start items-center justify-center">
+      <div className="flex gap-1 md:gap-2 shrink-0 self-start items-center justify-center">
         
          <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -113,7 +113,7 @@ const SongCard = ({song, onSelect}: {song: track, onSelect: (id: string) => void
       </BookOpenTextIcon>
       </Button>
       </DialogTrigger>
-    <Button variant={'outline'}>Publish</Button>
+    <Button variant={'outline'} size="sm"><span className="hidden sm:inline">Publish</span><span className="sm:hidden">Pub</span></Button>
         
       </div>
           

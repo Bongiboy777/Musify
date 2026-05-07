@@ -3,9 +3,11 @@ import React from 'react'
 
 const MainLayout = ({children}: {children: any}) => {
   return (
-    <div id="create-main" className="w-full h-screen flex flex-col justify-between items-center">
-        {children}
-        <div id="soundbar" className='w-full flex flex-1 items-center sticky bottom-0 absolute rigt-0'>
+    <div id="create-main" className="w-full h-screen flex flex-col items-center overflow-hidden">
+        <div className="flex-1 w-full overflow-auto">
+          {children}
+        </div>
+        <div id="soundbar" className='w-full shrink-0'>
             <SoundBar/>
         </div>
     </div>

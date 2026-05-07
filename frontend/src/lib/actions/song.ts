@@ -9,6 +9,7 @@ interface TrackInfo{
   thumbnail: string;
   playbackUrl: string;
   createdBy: string;
+  duration: number;
 }
 
 export async function getPlaybackUrl(id: string) : Promise<TrackInfo>{
@@ -60,7 +61,8 @@ const song = await db.song.findUnique({
     title: song.title!,
     thumbnail: imgUrl,
     playbackUrl:playbackUrl,
-    createdBy: song?.user.name
+    createdBy: song?.user.name,
+    duration: song.audioDuration
 
     }
 }

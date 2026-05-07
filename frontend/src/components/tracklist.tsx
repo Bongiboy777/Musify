@@ -38,10 +38,10 @@ const TrackList = ({ trackList }: { trackList: track[] }) => {
       id="track-list"
       className="flex h-fit w-full flex-col items-center gap-y-4 overflow-hidden"
     >
-      <div className="flex">
+      <div className="flex flex-wrap gap-2 w-full justify-center items-center px-2">
          <div
         id="search"
-        className="text-muted-foreground mx-2 flex w-60 items-center gap-2 overflow-hidden rounded-lg border-2 px-2"
+        className="text-muted-foreground flex flex-1 min-w-[150px] max-w-xs items-center gap-2 overflow-hidden rounded-lg border-2 px-2"
       >
         <Search size={16} className="m-0 p-0"></Search>
         <Input
@@ -63,14 +63,12 @@ const TrackList = ({ trackList }: { trackList: track[] }) => {
           <p>Refresh</p>
         </Button>
       </div>
-
-    <p>{playUrl}</p>
      
       <ScrollArea
         id="gallery"
-        className="flex h-screen w-full flex-col items-start gap-4 space-y-2"
+        className="flex h-[calc(100vh-12rem)] w-full flex-col items-start gap-4 space-y-2"
       >
-        <div className="h-fit w-full flex-1 gap-10 gap-y-60 p-4">
+        <div className="h-fit w-full flex-1 p-4 space-y-2">
           {filteredItems.map((track) => (
             <div key={track.id}>
             <SongCard song={track} onSelect={handleSelect} />

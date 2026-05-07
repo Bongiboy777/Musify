@@ -154,7 +154,7 @@ const SongPanel = () => {
     }
 
     return (
-        <div className="flex flex-1 sm:min-w-lg  border-r bg-muted h-svh px-8 max-w-md flex-col items-center gap-y-4 rounded-r-lg p-8">
+        <div className="flex w-full md:w-auto md:min-w-md lg:min-w-lg border-b md:border-b-0 md:border-r bg-muted md:h-svh px-4 md:px-8 md:max-w-md flex-col items-center gap-y-4 rounded-r-lg p-4 md:p-8 overflow-auto">
             <Tabs
                 defaultValue="simple"
                 value={mode}
